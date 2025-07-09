@@ -93,7 +93,7 @@
                     <td class="task-status">{{ task.status }}</td>
                     <td class="task-due-date">{{ task.due_date|date:"Y-m-d" }}</td>
                     <td class="action-btn-group text-center">
-                        <button type="button" class="btn btn-sm btn-info view-btn" data-task-id="{{ task.pk }}"><i class="bi bi-eye"></i> View</button>
+                        <button type="button" class="btn btn-sm btn-info view-btn mt-2" data-task-id="{{ task.pk }}"><i class="bi bi-eye"></i> View</button>
                         <button type="button" class="btn btn-sm btn-warning edit-btn mt-2" data-task-id="{{ task.pk }}"><i class="bi bi-pencil"></i> Edit</button>
                         <button type="button" class="btn btn-sm btn-danger delete-btn mt-2" data-task-id="{{ task.pk }}"><i class="bi bi-trash"></i> Delete</button>
                     </td>
@@ -142,6 +142,13 @@
                     <label for="id_assigned_to" class="form-label">Assigned To</label>
                     <div class="input-group"><span class="input-group-text "><i class="bi bi-person-fill"></i></span>{{ form.assigned_to }}</div>
                 </div>
+
+                 <div class="col-md-6 mb-3">
+                    <label for="email" class="form-label">Email</label>
+                    <div class="input-group"><span class="input-group-text "><i class="bi bi-person-fill"></i></span>{{ form.email }}</div>
+                </div>
+
+                
                 <div class="col-md-6 mb-3">
                     <label for="id_due_date" class="form-label">Due Date</label>
                     <div class="input-group"><span class="input-group-text"><i class="bi bi-calendar-event-fill"></i></span>{{ form.due_date }}</div>
@@ -209,6 +216,13 @@
                     <label for="edit_assigned_to" class="form-label">Assigned To</label>
                     <div class="input-group"><span class="input-group-text"><i class="bi bi-person-fill"></i></span><input type="text" id="edit_assigned_to" name="assigned_to" class="form-control" required></div>
                 </div>
+
+                <div class="col-md-6 mb-3">
+                    <label for="email" class="form-label">Email</label>
+                    <div class="input-group"><span class="input-group-text"><i class="bi bi-person-fill"></i></span><input type="text" id="email" name="email" class="form-control" required></div>
+                </div>
+
+
                 <div class="col-md-6 mb-3">
                     <label for="edit_due_date" class="form-label">Due Date</label>
                     <div class="input-group"><span class="input-group-text"><i class="bi bi-calendar-event-fill"></i></span><input type="date" id="edit_due_date" name="due_date" class="form-control" required></div>
@@ -309,6 +323,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     newRow.innerHTML = `
                         <td class="task-name">${data.task.name}</td>
                         <td class="task-assigned-to">${data.task.assigned_to}</td>
+                        <td class="task-email">${data.task.email}</td>
                         <td class="task-priority"><span class="badge bg-${data.task.priority_class}">${data.task.priority}</span></td>
                         <td class="task-status">${data.task.status}</td>
                         <td class="task-due-date">${data.task.due_date}</td>
@@ -375,6 +390,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     editTaskForm.querySelector('[name=task_name]').value = task.name;
                     editTaskForm.querySelector('[name=description]').value = task.description;
                     editTaskForm.querySelector('[name=assigned_to]').value = task.assigned_to;
+                    editTaskForm.querySelector('[name=email]').value = task.email;
                     editTaskForm.querySelector('[name=due_date]').value = task.due_date;
                     editTaskForm.querySelector('[name=priority]').value = task.priority;
                     editTaskForm.querySelector('[name=status]').value = task.status;
@@ -398,6 +414,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const row = document.getElementById(`task-${task.id}`);
                 row.querySelector('.task-name').textContent = task.name;
                 row.querySelector('.task-assigned-to').textContent = task.assigned_to;
+                row.querySelector('.task-email').textContent = task.email;
                 row.querySelector('.task-status').textContent = task.status;
                 row.querySelector('.task-due-date').textContent = task.due_date;
                 row.querySelector('.task-priority').innerHTML = `<span class="badge bg-${task.priority_class}">${task.priority}</span>`;

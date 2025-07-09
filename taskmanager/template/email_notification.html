@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>New Task Assigned</title>
+  </head>
+  <body>
+    <h2>Hello {{ task.assigned_to }},</h2>
+    <p>A new task has been assigned to you:</p>
+
+    <h3>{{ task.task_name }}</h3>
+
+    <p><strong>Description:</strong> {{ task.description|default:"N/A" }}</p>
+    <p><strong>Priority:</strong> {{ task.priority }}</p>
+    <p><strong>Due Date:</strong> {{ task.due_date }}</p>
+
+    <p>You can view the task in the Task Management System.</p>
+
+    <p>Thank you!</p>
+  </body>
+</html>

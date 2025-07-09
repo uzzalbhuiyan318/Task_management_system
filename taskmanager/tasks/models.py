@@ -19,6 +19,7 @@ class tasks(models.Model):
     task_name = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
     assigned_to = models.CharField(max_length=255)
+    email = models.EmailField(max_length=100, null=True)
     priority = models.CharField(max_length=20, choices=Priority_Choice, default='Medium')
     status = models.CharField(max_length=20, choices=Status_Choice, default='Pending')
     due_date = models.DateField()

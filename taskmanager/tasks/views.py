@@ -4,6 +4,9 @@ from django.db.models import Q
 from .models import tasks
 from .forms import TaskForm
 from django.http import JsonResponse
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
 
 
 def is_ajax(request):
@@ -23,6 +26,7 @@ def serialize_task(task):
         'name': task.task_name,
         'description': task.description or "",
         'assigned_to': task.assigned_to,
+        'email': task.email,
         'priority': task.priority,
         'priority_class': priority_class,
         'status': task.status,
@@ -75,6 +79,27 @@ def task_create(request):
         form = TaskForm(request.POST)
         if form.is_valid():
             task = form.save()
+             # --- Start of Email Sending Logic ---
+            subject = f'New Task Assigned: {task.task_name}'
+
+            # Render the HTML template with task context
+            html_message = render_to_string('email_notification.html', {'task': task})
+
+            # Create a plain text version of the email for compatibility
+            plain_message = strip_tags(html_message)
+
+            from_email = 'uzzalbhuiyan905@gmail.com'
+            to_email = task.email 
+
+            if to_email: 
+                send_mail(
+                    subject,
+                    plain_message,
+                    from_email,
+                    [to_email], 
+                    html_message=html_message
+                )
+            # --- End of Email Sending Logic ---
             if is_ajax(request):
                 return JsonResponse({'success': True, 'task': serialize_task(task)})
             return redirect("task_list")
@@ -127,6 +152,3 @@ def task_delete(request, pk):
     
     # For a regular GET request
     return render(request, 'task_confirm_delete.html', {'task': task})
-
-
-
