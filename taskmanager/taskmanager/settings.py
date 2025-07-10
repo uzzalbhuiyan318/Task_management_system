@@ -137,3 +137,7 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'uzzalbhuiyan905@gmail.com' 
 EMAIL_HOST_PASSWORD = 'aawx flgg besg rmxe'
+
+
+# Celery Configuration
+CELERY_BROKER_URL = 'amqp://guest:guest@localhost:5672//'
