@@ -4,6 +4,9 @@ from django.core.paginator import Paginator
 from django.db.models import Q
 from .models import Task
 from .forms import TaskForm
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
 # from .tasks import send_email_task # Uncomment if you are using Celery
 
 def is_ajax(request):
@@ -90,9 +93,28 @@ def task_create(request):
         form = TaskForm(request.POST)
         if form.is_valid():
             task = form.save()
-            # if task.email:
-            #     task_context = serialize_task(task)
-            #     send_email_task.delay(f'New Task: {task.task_name}', task.email, task_context)
+            # --- Start of Email Sending Logic ---
+            subject = f'New Task Assigned: {task.task_name}'
+
+            # Render the HTML template with task context
+            html_message = render_to_string('email_notification.html', {'task': task})
+
+            # Create a plain text version of the email for compatibility
+            plain_message = strip_tags(html_message)
+
+            from_email = 'uzzalbhuiyan905@gmail.com'
+            to_email = task.email 
+
+            if to_email: 
+                send_mail(
+                    subject,
+                    plain_message,
+                    from_email,
+                    [to_email],
+                    html_message=html_message
+                )
+            # --- End of Email Sending Logic ---
+            
             return JsonResponse({'success': True})
         return JsonResponse({'success': False, 'errors': form.errors}, status=400)
     return JsonResponse({'success': False}, status=400)
