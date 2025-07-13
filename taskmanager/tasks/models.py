@@ -3,8 +3,8 @@ from django.utils import timezone
 
 # Create your models here.
 
-class tasks(models.Model):
-    Priority_Choice = [
+class Task(models.Model):
+    PRIORITY_CHOICES = [
         ('Low', 'Low'),
         ('Medium', 'Medium'),
         ('High', 'High')
@@ -20,7 +20,7 @@ class tasks(models.Model):
     description = models.TextField(blank=True, null=True)
     assigned_to = models.CharField(max_length=255)
     email = models.EmailField(max_length=100, null=True)
-    priority = models.CharField(max_length=20, choices=Priority_Choice, default='Medium')
+    priority = models.CharField(max_length=20, choices=PRIORITY_CHOICES, default='Medium')
     status = models.CharField(max_length=20, choices=Status_Choice, default='Pending')
     due_date = models.DateField()
     created_date = models.DateTimeField(auto_now_add=True)
