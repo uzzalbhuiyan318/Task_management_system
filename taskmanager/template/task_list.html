@@ -1,3 +1,5 @@
+{% extends 'base.html' %} {% block body %}
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -543,6 +545,8 @@
           });
         }
 
+        {% comment %} Edit start here {% endcomment %}
+
         function handleEdit(taskId) {
           $("#edit-spinner").removeClass("d-none");
           $("#editTaskForm").addClass("d-none");
@@ -561,7 +565,7 @@
                 );
                 $("#edit_task_name").val(task.task_name);
                 $("#edit_description").val(task.description);
-                $("#edit_assigned_to").val(task.assigned_to);
+                $("#edit_assigned_to").val(task.assigned_to.username);
                 $("#edit_email").val(task.email);
                 $("#edit_due_date").val(task.due_date);
                 $("#edit_priority").val(task.priority);
@@ -609,6 +613,8 @@
             },
           });
         });
+
+        {% comment %} edit ends here {% endcomment %}
 
         function handleDelete(taskId) {
           $("#delete-task-name").text("this task");
@@ -673,3 +679,5 @@
     </script>
   </body>
 </html>
+
+{% endblock body %}

@@ -29,6 +29,8 @@ INSTALLED_APPS = [
     "tasks",
 ]
 
+AUTH_USER_MODEL = "tasks.CustomUser"
+
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -65,11 +67,12 @@ WSGI_APPLICATION = "taskmanager.wsgi.application"
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'task_manager_db', # The name of the database you just created
-        'USER': 'root',             # The default XAMPP username
-        'PASSWORD': '',              # The default XAMPP password is an empty string
-        'HOST': '127.0.0.1',         # Or 'localhost'
-        'PORT': '3306',              # The default MySQL port
+        'NAME': 'task_manager_db', 
+        'USER': 'root',             
+        'PASSWORD': '',              
+        'HOST': '127.0.0.1',         
+        'PORT': '3306',   
+        'OPTIONS': {'sql_mode': 'STRICT_TRANS_TABLES'},
     }
 }
 
@@ -108,6 +111,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
+
 STATIC_URL = "static/"
 STATICFILES_DIRS = [
     BASE_DIR / "taskmanager/static",
@@ -115,6 +119,8 @@ STATICFILES_DIRS = [
 STATIC_ROOT = BASE_DIR / "staticfiles"
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
+
+LOGIN_URL = "loginPage"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 

@@ -1,12 +1,14 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse
 from django.core.paginator import Paginator
 from django.db.models import Q
-from .models import Task
-from .forms import TaskForm
+from .models import *
+from .forms import TaskForm, TaskEditForm
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
+from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth.decorators import login_required
 # from .tasks import send_email_task # Uncomment if you are using Celery
 
 def is_ajax(request):
@@ -26,19 +28,24 @@ def serialize_task(task):
         # **FIX:** Changed 'name' to 'task_name' to match JavaScript expectations
         'task_name': task.task_name,
         'description': task.description or "",
-        'assigned_to': task.assigned_to,
+        'assigned_to': task.assigned_to.username if task.assigned_to else "N/A",
         'email': task.email,
         'priority': task.priority,
         'priority_class': priority_class,
         'status': task.status,
         'due_date': task.due_date.strftime('%Y-%m-%d'),
     }
+    
+def home(request):
+    return render(request, "home.html")
 
+@login_required
 def task_list(request):
     """ This view renders the main page with the JQGrid structure. """
     form = TaskForm()
     return render(request, 'task_list.html', {'form': form})
 
+@login_required
 def jqgrid_tasks(request):
     """ This view provides data specifically for the JQGrid plugin. """
     page = int(request.GET.get('page', 1))
@@ -77,7 +84,7 @@ def jqgrid_tasks(request):
         'rows': [
             { 'id': task.id, 'cell': [
                 task.task_name,
-                task.assigned_to,
+                task.assigned_to.username,
                 task.email,
                 task.priority,
                 task.status,
@@ -88,6 +95,7 @@ def jqgrid_tasks(request):
     }
     return JsonResponse(response)
 
+@login_required
 def task_create(request):
     if request.method == "POST":
         form = TaskForm(request.POST)
@@ -119,25 +127,91 @@ def task_create(request):
         return JsonResponse({'success': False, 'errors': form.errors}, status=400)
     return JsonResponse({'success': False}, status=400)
 
+@login_required
 def task_detail(request, pk):
     task = get_object_or_404(Task, pk=pk)
     if is_ajax(request):
         return JsonResponse({'success': True, 'task': serialize_task(task)})
     return JsonResponse({'success': False}, status=400)
 
+@login_required
 def task_update(request, pk):
     task = get_object_or_404(Task, pk=pk)
     if request.method == "POST":
-        form = TaskForm(request.POST, instance=task)
+        form = TaskEditForm(request.POST, instance=task)
         if form.is_valid():
             form.save()
             return JsonResponse({'success': True})
         return JsonResponse({'success': False, 'errors': form.errors}, status=400)
     return JsonResponse({'success': False}, status=400)
 
+@login_required
 def task_delete(request, pk):
     task = get_object_or_404(Task, pk=pk)
     if request.method == 'POST':
         task.delete()
         return JsonResponse({'success': True})
     return JsonResponse({'success': False}, status=400)
+
+
+def registration(request):
+    
+    if request.method == 'POST':
+        user_type = request.POST.get("user_type")
+        username = request.POST.get("username")
+        email = request.POST.get("email")
+        password = request.POST.get("password")
+        confirm_password = request.POST.get("confirm_password")
+        gender = request.POST.get("gender")
+        age = request.POST.get("age")
+        contact_no = request.POST.get("contact_no")
+        profile_pic = request.FILES.get("profile_pic")
+        
+        
+        if password == confirm_password:
+            
+            user = CustomUser.objects.create_user(
+                username = username,
+                email = email,
+                password = password,
+                user_type= user_type,
+                gender = gender,
+                age = age,
+                contact_no = contact_no,
+                profile_pic = profile_pic,
+            )
+                
+            return redirect("tasks:loginPage")
+    
+    return render(request, "registration.html" )
+
+
+def loginPage(request):
+    if request.method == 'POST':
+        user_name = request.POST.get("username")
+        pass_word = request.POST.get("password")
+        
+        try:
+            user = authenticate(request, username=user_name, password = pass_word)
+            
+            if user is not None:
+                login(request, user)
+                return redirect("tasks:task_list")
+            else:
+                return redirect("tasks:registration")
+        
+        except CustomUser.DoesNotExist:
+            return redirect("tasks:task_list")
+    
+    
+    return render(request, 'loginPage.html')
+
+
+def logoutPage(request):
+    
+    logout(request)
+    
+    return render(request, "registration.html")
+
+
+
