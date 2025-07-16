@@ -12,5 +12,6 @@ class TaskAdmin(admin.ModelAdmin):
     list_per_page = 10
     
 admin.site.register(CustomUser)
+admin.site.register(EmployeeProfile)
 
     

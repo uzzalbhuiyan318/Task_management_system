@@ -1,0 +1,90 @@
+{% extends 'base.html' %} {% block body %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Employee Profile</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        background-color: #f8f9fa;
+      }
+      .profile-card {
+        width: 400px;
+        margin-top: 60px;
+        padding: 30px;
+        background-color: #ffffff;
+        border-radius: 15px;
+        box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1);
+      .profile-title {
+        font-size: 28px;
+        font-weight: bold;
+      }
+      .profile-label {
+        font-weight: 600;
+        color: #495057;
+      }
+      .profile-data {
+        color: #212529;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="profile-card shadow ms-0">
+        <div class="text-center mb-4">
+          <h2 class="profile-title">Employee Profile</h2>
+        </div>
+
+        <div class="mb-4 row justify-content-center">
+          <div class="col-sm-8 text-center">
+            <img
+              src="/{{ request.user.profile_pic }}"
+              class="profile_pic img-fluid rounded-circle"
+              alt="profile_pic"
+              style="max-width: 150px; height: auto"
+            />
+          </div>
+        </div>
+
+        <div class="mb-3 row">
+          <label class="col-sm-4 col-form-label profile-label">Username:</label>
+          <div class="col-sm-8">
+            <p class="form-control-plaintext profile-data">
+              {{ request.user.username }}
+            </p>
+          </div>
+        </div>
+
+        <div class="mb-3 row">
+          <label class="col-sm-4 col-form-label profile-label">Email:</label>
+          <div class="col-sm-8">
+            <p class="form-control-plaintext profile-data">
+              {{ request.user.email }}
+            </p>
+          </div>
+        </div>
+
+        <div class="mb-3 row">
+          <label class="col-sm-4 col-form-label profile-label"
+            >Contact no:</label
+          >
+          <div class="col-sm-8">
+            <p class="form-control-plaintext profile-data">
+              {{ request.user.contact_no }}
+            </p>
+          </div>
+        </div>
+
+        <div class="text-center mt-4">
+          <a href="#" class="btn btn-primary px-4">Edit Profile</a>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
+
+{% endblock body %}

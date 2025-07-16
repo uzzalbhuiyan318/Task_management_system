@@ -214,4 +214,12 @@ def logoutPage(request):
     return render(request, "registration.html")
 
 
+def EmployeeProfilePage(request):
+    
+    employee = EmployeeProfile.objects.all()
+
+     
+    return render(request, "EmployeeProfilePage.html", {'employee': employee})
+
+
 
