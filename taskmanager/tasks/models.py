@@ -63,6 +63,16 @@ class EmployeeProfile(models.Model):
     
     def __str__(self):
         return f"username: {self.username}"
+
+
+class AdminProfile(models.Model):
+    username = models.OneToOneField('CustomUser', on_delete=models.CASCADE, related_name='admin')
+    role = models.CharField(max_length=100, null=True)
+    permissions = models.TextField(null=True)
+    
+    def __str__(self):
+        
+        return f"Admin Profile for {self.username}"
     
 
 

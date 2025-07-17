@@ -3,12 +3,13 @@ from django.http import JsonResponse
 from django.core.paginator import Paginator
 from django.db.models import Q
 from .models import *
-from .forms import TaskForm, TaskEditForm
+from .forms import *
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import PermissionDenied
 # from .tasks import send_email_task # Uncomment if you are using Celery
 
 def is_ajax(request):
@@ -180,6 +181,11 @@ def registration(request):
                 contact_no = contact_no,
                 profile_pic = profile_pic,
             )
+            
+            if user_type == 'employee':
+                   EmployeeProfile.objects.create(username=user)
+            elif user_type == 'admin':
+                   AdminProfile.objects.create(username=user)
                 
             return redirect("tasks:loginPage")
     
@@ -214,12 +220,57 @@ def logoutPage(request):
     return render(request, "registration.html")
 
 
+@login_required
 def EmployeeProfilePage(request):
-    
-    employee = EmployeeProfile.objects.all()
+        
+    return render(request, "EmployeeProfilePage.html")
 
-     
-    return render(request, "EmployeeProfilePage.html", {'employee': employee})
+
+
+
+@login_required
+def edit_profile(request):
+    user = request.user
+    profile = None
+    ProfileForm = None
+
+    # Check if the user is a superuser and create an admin profile if it doesn't exist
+    if user.is_superuser:
+        profile, created = AdminProfile.objects.get_or_create(username=user)
+        if created:
+            # Optionally set default values for the new admin profile
+            profile.role = 'Superuser'
+            profile.permissions = 'All'
+            profile.save()
+        ProfileForm = EditAdminForm
+    elif user.user_type == '1':
+        profile, _ = AdminProfile.objects.get_or_create(username=user)
+        ProfileForm = EditAdminForm
+    elif user.user_type == '2':
+        profile, _ = EmployeeProfile.objects.get_or_create(username=user)
+        ProfileForm = EditEmployeeForm
+    else:
+        # Fallback for users with no defined user_type, redirect to a safe page
+        return redirect('tasks:task_list')
+
+    if request.method == 'POST':
+        user_form = ProfileEditForm(request.POST, request.FILES, instance=user)
+        profile_form = ProfileForm(request.POST, instance=profile) if ProfileForm else None
+
+        if user_form.is_valid() and (profile_form is None or profile_form.is_valid()):
+            user_form.save()
+            if profile_form:
+                profile_form.save()
+            return redirect('tasks:EmployeeProfilePage')
+
+    else:
+        user_form = ProfileEditForm(instance=user)
+        profile_form = ProfileForm(instance=profile) if ProfileForm else None
+
+    return render(request, 'edit_profile.html', {
+        'user_form': user_form,
+        'profile_form': profile_form,
+    })
 
 
 

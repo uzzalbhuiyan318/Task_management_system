@@ -11,14 +11,18 @@
     <style>
       body {
         background-color: #f8f9fa;
+        position: relative;
       }
       .profile-card {
+        position: absolute;
+        left: 40px;
         width: 400px;
-        margin-top: 60px;
+        margin-top: 40px;
         padding: 30px;
         background-color: #ffffff;
         border-radius: 15px;
         box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1);
+      }
       .profile-title {
         font-size: 28px;
         font-weight: bold;
@@ -33,7 +37,7 @@
     </style>
   </head>
   <body>
-    <div class="container">
+    <div class="">
       <div class="profile-card shadow ms-0">
         <div class="text-center mb-4">
           <h2 class="profile-title">Employee Profile</h2>
@@ -42,7 +46,7 @@
         <div class="mb-4 row justify-content-center">
           <div class="col-sm-8 text-center">
             <img
-              src="/{{ request.user.profile_pic }}"
+              src="{{ request.user.profile_pic.url }}"
               class="profile_pic img-fluid rounded-circle"
               alt="profile_pic"
               style="max-width: 150px; height: auto"
@@ -79,8 +83,19 @@
           </div>
         </div>
 
+        <div class="mb-3 row">
+          <label class="col-sm-4 col-form-label profile-label">User_Type</label>
+          <div class="col-sm-8">
+            <p class="form-control-plaintext profile-data">
+              {{ request.user.user_type }}
+            </p>
+          </div>
+        </div>
+
         <div class="text-center mt-4">
-          <a href="#" class="btn btn-primary px-4">Edit Profile</a>
+          <a href="{% url 'tasks:edit_profile' %} " class="btn btn-primary px-4"
+            >Edit Profile</a
+          >
         </div>
       </div>
     </div>

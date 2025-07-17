@@ -13,5 +13,6 @@ class TaskAdmin(admin.ModelAdmin):
     
 admin.site.register(CustomUser)
 admin.site.register(EmployeeProfile)
+admin.site.register(AdminProfile)
 
     

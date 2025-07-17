@@ -1,3 +1,5 @@
+{% extends 'base.html' %} {% block body %}
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -133,8 +135,8 @@
                   required
                 >
                   <option value="" disabled selected>Select your role</option>
-                  <option value="1">Admin</option>
-                  <option value="2">Employee</option>
+                  <option value="1">admin</option>
+                  <option value="2">employee</option>
                 </select>
               </div>
               <div class="col-md-6 mb-3">
@@ -249,3 +251,5 @@
     </script>
   </body>
 </html>
+
+{% endblock body %}

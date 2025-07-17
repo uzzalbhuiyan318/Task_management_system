@@ -16,4 +16,5 @@ urlpatterns = [
     path('loginPage/', loginPage, name='loginPage'),
     path('logoutPage/', logoutPage, name='logoutPage'),
     path('EmployeeProfilePage/', EmployeeProfilePage, name='EmployeeProfilePage'),
+    path('edit_profile/', edit_profile, name='edit_profile'),
 ]
