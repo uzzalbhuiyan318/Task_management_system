@@ -83,15 +83,6 @@
           </div>
         </div>
 
-        <div class="mb-3 row">
-          <label class="col-sm-4 col-form-label profile-label">User_Type</label>
-          <div class="col-sm-8">
-            <p class="form-control-plaintext profile-data">
-              {{ request.user.user_type }}
-            </p>
-          </div>
-        </div>
-
         <div class="text-center mt-4">
           <a href="{% url 'tasks:edit_profile' %} " class="btn btn-primary px-4"
             >Edit Profile</a

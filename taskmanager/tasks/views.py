@@ -271,6 +271,11 @@ def edit_profile(request):
         'user_form': user_form,
         'profile_form': profile_form,
     })
+    
+    
+def login_required(request):
+        
+    return render(request, 'login_required.html')
 
 
 
