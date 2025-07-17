@@ -40,7 +40,11 @@
     <div class="">
       <div class="profile-card shadow ms-0">
         <div class="text-center mb-4">
+          {% if user.is_authenticated %} {% if user.user_type == '1' %}
+          <h2 class="profile-title">Admin Profile</h2>
+          {% elif user.user_type == '2'%}
           <h2 class="profile-title">Employee Profile</h2>
+          {% endif %} {% endif %}
         </div>
 
         <div class="mb-4 row justify-content-center">

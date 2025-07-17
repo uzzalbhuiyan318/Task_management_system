@@ -221,9 +221,9 @@ def logoutPage(request):
 
 
 @login_required
-def EmployeeProfilePage(request):
+def AdminProfilePage(request):
         
-    return render(request, "EmployeeProfilePage.html")
+    return render(request, "AdminProfilePage.html")
 
 
 
@@ -246,6 +246,8 @@ def edit_profile(request):
     elif user.user_type == '1':
         profile, _ = AdminProfile.objects.get_or_create(username=user)
         ProfileForm = EditAdminForm
+        
+        
     elif user.user_type == '2':
         profile, _ = EmployeeProfile.objects.get_or_create(username=user)
         ProfileForm = EditEmployeeForm
@@ -261,7 +263,7 @@ def edit_profile(request):
             user_form.save()
             if profile_form:
                 profile_form.save()
-            return redirect('tasks:EmployeeProfilePage')
+            return redirect('tasks:AdminProfilePage')
 
     else:
         user_form = ProfileEditForm(instance=user)
@@ -271,6 +273,7 @@ def edit_profile(request):
         'user_form': user_form,
         'profile_form': profile_form,
     })
+       
     
     
 def login_required(request):

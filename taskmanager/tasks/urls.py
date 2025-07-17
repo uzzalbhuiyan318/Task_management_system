@@ -15,7 +15,7 @@ urlpatterns = [
     path('registration/', registration, name='registration'),
     path('loginPage/', loginPage, name='loginPage'),
     path('logoutPage/', logoutPage, name='logoutPage'),
-    path('EmployeeProfilePage/', EmployeeProfilePage, name='EmployeeProfilePage'),
+    path('AdminProfilePage/', AdminProfilePage, name='AdminProfilePage'),
     path('edit_profile/', edit_profile, name='edit_profile'),
     path('login_required/', login_required, name='login_required'),
 ]
