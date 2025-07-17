@@ -59,6 +59,7 @@
     <div class="container mt-4">
       <div class="d-flex justify-content-between align-items-center mb-4">
         <h1>Task Management System</h1>
+        {% if user.is_authenticated %} {% if user.user_type == '1'%}
         <button
           type="button"
           class="btn btn-primary"
@@ -67,6 +68,7 @@
         >
           <i class="bi bi-plus-circle me-1"></i> Add New Task
         </button>
+        {% endif %} {% endif %}
       </div>
 
       <div class="filter-form">

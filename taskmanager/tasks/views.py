@@ -1,4 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.admin.views.decorators import staff_member_required
+from collections import Counter
 from django.http import JsonResponse
 from django.core.paginator import Paginator
 from django.db.models import Q
@@ -243,7 +245,7 @@ def edit_profile(request):
             profile.permissions = 'All'
             profile.save()
         ProfileForm = EditAdminForm
-    elif user.user_type == '1':
+    elif user.user_type == '1' or user.is_staff:
         profile, _ = AdminProfile.objects.get_or_create(username=user)
         ProfileForm = EditAdminForm
         
@@ -279,6 +281,28 @@ def edit_profile(request):
 def login_required(request):
         
     return render(request, 'login_required.html')
+
+
+
+
+# .....................................................
+#Admin Dashboard start here
+#......................................................
+
+@staff_member_required
+def AdminDashboard(request):
+    status_list = Task.objects.values_list('status', flat=True)
+    status_count = Counter(status_list)
+
+    context = {
+        'pending': status_count.get('Pending', 0),
+        'inprogress': status_count.get('In Progress', 0),
+        'completed': status_count.get('Completed', 0),
+    }
+    
+
+    return render(request, 'admin/AdminDashboard.html', context)
+
 
 
 

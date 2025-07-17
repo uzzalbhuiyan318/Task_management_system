@@ -18,4 +18,5 @@ urlpatterns = [
     path('AdminProfilePage/', AdminProfilePage, name='AdminProfilePage'),
     path('edit_profile/', edit_profile, name='edit_profile'),
     path('login_required/', login_required, name='login_required'),
+    path('AdminDashboard/', AdminDashboard, name='AdminDashboard'),
 ]

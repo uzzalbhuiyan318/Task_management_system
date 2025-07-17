@@ -39,13 +39,13 @@
   <body>
     <div class="">
       <div class="profile-card shadow ms-0">
-        <div class="text-center mb-4">
-          {% if user.is_authenticated %} {% if user.user_type == '1' %}
-          <h2 class="profile-title">Admin Profile</h2>
-          {% elif user.user_type == '2'%}
-          <h2 class="profile-title">Employee Profile</h2>
-          {% endif %} {% endif %}
-        </div>
+        {% if user.is_authenticated %} 
+          {% if user.user_type == '1'  or user.is_staff %}
+            <h2 class="profile-title text-center mb-3">Admin Profile</h2>
+          {% elif user.user_type == '2' %}
+            <h2 class="profile-title text-center">Employee Profile</h2>
+          {% endif %} 
+        {% endif %}
 
         <div class="mb-4 row justify-content-center">
           <div class="col-sm-8 text-center">
