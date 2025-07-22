@@ -3,12 +3,13 @@
   <div class="row justify-content-center">
     <div class="col-lg-6 mt-5">
       <div class="card shadow p-4 rounded-4">
-        {% if user.is_authenticated %} {% if user.user_type == '1' or user.is_staff %}
-        <h2 class="text-center text-primary mb-4">Admin Profile</h2>
-        {% elif user.user_type == '2' %}
-        <h2 class="text-center text-success mb-4">Employee Profile</h2>
-        {% endif %} {% endif %}
-
+        {% if user.is_authenticated %} 
+          {% if user.user_type == '1' or user.is_staff %}
+            <h2 class="text-center text-primary mb-4">Admin Profile</h2>
+            {% elif user.user_type == '2' %}
+            <h2 class="text-center text-success mb-4">Employee Profile</h2>
+          {% endif %}         
+        {% endif %}
 
         <div class="mb-4 row justify-content-center">
           <div class="col-sm-6 text-center">
@@ -39,6 +40,13 @@
           <label class="col-sm-4 col-form-label fw-semibold">Contact No:</label>
           <div class="col-sm-8">
             <p class="form-control-plaintext">{{ request.user.contact_no }}</p>
+          </div>
+        </div>
+
+        <div class="mb-3 row">
+          <label class="col-sm-4 col-form-label fw-semibold">User_Type:</label>
+          <div class="col-sm-8">
+            <p class="form-control-plaintext">{{ request.user.user_type }}</p>
           </div>
         </div>
 

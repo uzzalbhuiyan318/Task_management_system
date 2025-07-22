@@ -1,5 +1,5 @@
 <div class="topnav">
-  {% if user.is_authenticated %} {% if user.user_type == '1' or user.is_staff %}
+  {% if user.is_authenticated %} {% if user.user_type == '1' or user.is_staff or user.user_type == 'admin' %}
   {% comment %} <a href="{% url 'tasks:AdminDashboard' %}">Dashboard</a>
   <a href="{% url 'tasks:task_list' %}">Task List</a>
   {% endcomment %}
