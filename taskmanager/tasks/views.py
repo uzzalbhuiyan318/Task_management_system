@@ -293,13 +293,17 @@ def login_required(request):
 def AdminDashboard(request):
     status_list = Task.objects.values_list('status', flat=True)
     status_count = Counter(status_list)
+    priority_list = Task.objects.values_list('priority', flat=True)
+    priority_count = Counter(priority_list)
 
     context = {
         'pending': status_count.get('Pending', 0),
         'inprogress': status_count.get('In Progress', 0),
         'completed': status_count.get('Completed', 0),
+        'high': priority_count.get('High', 0),
+        'medium': priority_count.get('Medium', 0),
+        'low': priority_count.get('Low', 0),
     }
-    
 
     return render(request, 'admin/AdminDashboard.html', context)
 
