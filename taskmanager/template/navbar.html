@@ -1,9 +1,13 @@
 <div class="topnav">
   {% if user.is_authenticated %} {% if user.user_type == '1' or user.is_staff %}
-  <a href="{% url 'tasks:AdminDashboard' %}">Dashboard</a>
+  {% comment %} <a href="{% url 'tasks:AdminDashboard' %}">Dashboard</a>
   <a href="{% url 'tasks:task_list' %}">Task List</a>
+  {% endcomment %}
   <a href="{% url 'tasks:AdminProfilePage' %}">Profile</a>
-  <a href="{% url 'tasks:logoutPage' %}" class="split">Logout</a>
+  {% comment %}
+  <a href="{% url 'tasks:logoutPage' %}" class="split">Logout</a> {% endcomment %}
+
+
 
   {% elif user.user_type == '2' %}
   <a href="{% url 'tasks:home' %}">Home</a>

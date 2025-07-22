@@ -308,5 +308,10 @@ def AdminDashboard(request):
     return render(request, 'admin/AdminDashboard.html', context)
 
 
+def admin_base(request):
+    
+    return render(request, "admin/admin_base.html")
+
+
 
 
