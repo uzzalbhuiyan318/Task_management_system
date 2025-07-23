@@ -44,9 +44,24 @@ def home(request):
 
 @login_required
 def task_list(request):
-    """ This view renders the main page with the JQGrid structure. """
+    if request.user.is_authenticated and (
+        request.user.user_type == '1' or str(request.user.user_type).lower() == 'admin'
+    ):
+        base_template = 'admin/admin_base.html'
+    else:
+        base_template = 'base.html'
+    
+    tasks = Task.objects.all()
     form = TaskForm()
-    return render(request, 'task_list.html', {'form': form})
+
+    context = {
+        'tasks': tasks,
+        'form': form,
+        'base_template': base_template
+    }
+
+    # ✅ Pass single context dictionary
+    return render(request, 'task_list.html', context)
 
 @login_required
 def jqgrid_tasks(request):
@@ -204,7 +219,12 @@ def loginPage(request):
             
             if user is not None:
                 login(request, user)
-                return redirect("tasks:task_list")
+                if  user.is_authenticated and (user.user_type == '1' or user.user_type == 'admin'):
+                    return redirect("tasks:AdminDashboard")
+                elif user.is_authenticated and (user.user_type == '2' or user.user_type == 'employee'):
+                    return redirect("tasks:task_list")
+                else:
+                    return redirect("tasks:home")
             else:
                 return redirect("tasks:registration")
         
@@ -311,6 +331,7 @@ def AdminDashboard(request):
 def admin_base(request):
     
     return render(request, "admin/admin_base.html")
+
 
 
 
