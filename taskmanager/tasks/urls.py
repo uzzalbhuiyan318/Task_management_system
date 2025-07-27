@@ -17,7 +17,9 @@ urlpatterns = [
     path('logoutPage/', logoutPage, name='logoutPage'),
     path('AdminProfilePage/', AdminProfilePage, name='AdminProfilePage'),
     path('edit_profile/', edit_profile, name='edit_profile'),
-    path('login_required/', login_required, name='login_required'),
+    path('login_required_view/', login_required_view, name='login_required_view'),
     path('AdminDashboard/', AdminDashboard, name='AdminDashboard'),
     path('admin_base/', admin_base, name='admin_base'),
+    path('employeeProfilePage/', employeeProfilePage, name='employeeProfilePage'),
+    path('employeeDashboard/', employeeDashboard, name='employeeDashboard'),
 ]

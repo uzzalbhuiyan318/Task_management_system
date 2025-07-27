@@ -1,0 +1,131 @@
+{% extends 'admin/admin_base.html' %}
+{% load static %}
+
+{% block title %}Employee Dashboard{% endblock %}
+
+{% block content %}
+<style>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+
+  .dashboard-header {
+    font-size: 2.5rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 0.2rem;
+  }
+
+  .dashboard-subheader {
+    font-size: 1rem;
+    color: #6c757d;
+    text-align: center;
+    margin-bottom: 2.5rem;
+  }
+
+  .section-title {
+    font-weight: 600;
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    color: #333;
+  }
+
+  .card-modern {
+    border-radius: 20px;
+    padding: 2rem;
+    text-align: center;
+    color: #fff;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    font-weight: 600;
+  }
+
+  .card-modern:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+  }
+
+  .card-blue { background-color: #007bff; }
+  .card-yellow { background-color: #ffc107; color: #000; }
+  .card-cyan { background-color: #17c0eb; color: #000; }
+  .card-green { background-color: #28a745; }
+  .card-red { background-color: #dc3545; }
+  .card-gray { background-color: #6c757d; }
+  .card-light { background-color: #f8f9fa; color: #212529; }
+
+  .card-value {
+    font-size: 2.2rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .card-label {
+    font-size: 1rem;
+    opacity: 0.9;
+  }
+
+  .dashboard-section {
+    margin-bottom: 3rem;
+  }
+</style>
+
+<div class="container py-5">
+  <h1 class="dashboard-header">Employee Dashboard</h1>
+  <p class="dashboard-subheader">Overview of task statuses and priorities</p>
+
+  <!-- Task Status -->
+  <div class="dashboard-section">
+    <h5 class="section-title">📊 Task Status Overview</h5>
+    <div class="row g-4">
+      <div class="col-md-3">
+        <div class="card-modern card-blue">
+          <div class="card-value">{{ total_tasks }}</div>
+          <div class="card-label">Total Assigned Tasks</div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card-modern card-yellow">
+          <div class="card-value">{{ pending }}</div>
+          <div class="card-label">Pending Tasks</div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card-modern card-cyan">
+          <div class="card-value">{{ inprogress }}</div>
+          <div class="card-label">In Progress</div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card-modern card-green">
+          <div class="card-value">{{ completed }}</div>
+          <div class="card-label">Completed Tasks</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Task Priority -->
+  <div class="dashboard-section">
+    <h5 class="section-title">🚦 Task Priority Overview</h5>
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="card-modern card-red">
+          <div class="card-value">{{ high }}</div>
+          <div class="card-label">High Priority</div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card-modern card-gray">
+          <div class="card-value">{{ medium }}</div>
+          <div class="card-label">Medium Priority</div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card-modern card-light">
+          <div class="card-value">{{ low }}</div>
+          <div class="card-label">Low Priority</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

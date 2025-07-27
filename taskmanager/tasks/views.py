@@ -48,6 +48,9 @@ def task_list(request):
         request.user.user_type == '1' or str(request.user.user_type).lower() == 'admin'
     ):
         base_template = 'admin/admin_base.html'
+        
+    elif request.user.is_authenticated and (request.user.user_type == '2' or str(request.user.user_type).lower() == 'employee'):
+        base_template = 'admin/admin_base.html'
     else:
         base_template = 'base.html'
     
@@ -222,7 +225,7 @@ def loginPage(request):
                 if  user.is_authenticated and (user.user_type == '1' or user.user_type == 'admin'):
                     return redirect("tasks:AdminDashboard")
                 elif user.is_authenticated and (user.user_type == '2' or user.user_type == 'employee'):
-                    return redirect("tasks:task_list")
+                    return redirect("tasks:employeeDashboard")
                 else:
                     return redirect("tasks:home")
             else:
@@ -245,7 +248,7 @@ def logoutPage(request):
 @login_required
 def AdminProfilePage(request):
         
-    return render(request, "AdminProfilePage.html")
+    return render(request, "admin/AdminProfilePage.html")
 
 
 
@@ -298,9 +301,9 @@ def edit_profile(request):
        
     
     
-def login_required(request):
+def login_required_view(request):
         
-    return render(request, 'login_required.html')
+    return render(request, 'login_required_view.html')
 
 
 
@@ -308,6 +311,11 @@ def login_required(request):
 # .....................................................
 #Admin Dashboard start here
 #......................................................
+
+
+def admin_base(request):
+    
+    return render(request, "admin/admin_base.html")
 
 @staff_member_required
 def AdminDashboard(request):
@@ -328,10 +336,41 @@ def AdminDashboard(request):
     return render(request, 'admin/AdminDashboard.html', context)
 
 
-def admin_base(request):
-    
-    return render(request, "admin/admin_base.html")
+# employee panel start here
 
+def employeeProfilePage(request):
+    
+    return render(request, 'employeeProfilePage.html')
+
+
+@login_required
+def employeeDashboard(request):
+    
+    user = request.user
+
+    # Only query once for better performance
+    user_tasks = Task.objects.filter(assigned_to=user)
+    
+    total_tasks = user_tasks.count()
+
+    # Count statuses and priorities
+    status_list = user_tasks.values_list('status', flat=True)
+    status_count = Counter(status_list)
+
+    priority_list = user_tasks.values_list('priority', flat=True)
+    priority_count = Counter(priority_list)
+
+    context = {
+        'total_tasks': total_tasks,
+        'pending': status_count.get('Pending', 0),
+        'inprogress': status_count.get('In Progress', 0),
+        'completed': status_count.get('Completed', 0),
+        'high': priority_count.get('High', 0),
+        'medium': priority_count.get('Medium', 0),
+        'low': priority_count.get('Low', 0),
+    }
+
+    return render(request, 'employee/employeeDashboard.html', context)
 
 
 
