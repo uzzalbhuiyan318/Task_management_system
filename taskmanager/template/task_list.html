@@ -431,7 +431,21 @@
           var taskId = options.rowId;
           var viewBtn = `<button type="button" class="btn btn-sm btn-info view-btn" data-task-id="${taskId}" title="View"><i class="bi bi-eye"></i></button>`;
           var editBtn = `<button type="button" class="btn btn-sm btn-warning edit-btn" data-task-id="${taskId}" title="Edit"><i class="bi bi-pencil"></i></button>`;
-          var deleteBtn = `<button type="button" class="btn btn-sm btn-danger delete-btn" data-task-id="${taskId}" title="Delete"><i class="bi bi-trash"></i></button>`;
+          
+          {% if user.is_authenticated %}
+            
+            {% if user.user_type == '1' or user.user_type == 'admin' %}
+              var deleteBtn = `<button type="button" class="btn btn-sm btn-danger delete-btn" data-task-id="${taskId}" title="Delete"><i class="bi bi-trash"></i></button>`;
+            {% endif %}
+            
+            {% if user.user_type == '2' or user.user_type == 'employee' %}
+              var deleteBtn = `<button type="button" class="btn btn-sm btn-danger delete-btn disabled" data-task-id="${taskId}" title="Delete"><i class="bi bi-trash"></i></button>`;
+            {% endif %}
+              
+
+          {% endif %}
+            
+          {% comment %} var deleteBtn = `<button type="button" class="btn btn-sm btn-danger delete-btn" data-task-id="${taskId}" title="Delete"><i class="bi bi-trash"></i></button>`; {% endcomment %}
           return `<div class="action-btn-group">${viewBtn} ${editBtn} ${deleteBtn}</div>`;
         }
 
@@ -445,9 +459,9 @@
               { label: "Task Name", name: "task_name", width: 60 },
               { label: "Assigned To", name: "assigned_to", width: 50 },
               { label: "Email", name: "email", width: 70 },
-              { label: "Priority", name: "priority", width: 30 },
-              { label: "Status", name: "status", width: 30 },
-              { label: "Due Date", name: "due_date", width: 60 },
+              { label: "Priority", name: "priority", width: 40 },
+              { label: "Status", name: "status", width: 40 },
+              { label: "Due Date", name: "due_date", width: 40 },
               {
                 label: "Actions",
                 name: "id",

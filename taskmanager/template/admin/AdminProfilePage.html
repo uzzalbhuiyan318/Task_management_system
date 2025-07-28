@@ -101,9 +101,9 @@
         <div class="text-start mb-3 row">
           <label class="col-sm-4 profile-label">User Type:</label>
           <div class="col-sm-8 profile-value">
-            {% if request.user.user_type == '1' %}
+            {% if request.user.user_type == '1' or request.user.user_type == 'admin' %}
               Admin
-            {% elif request.user.user_type == '2' %}
+            {% elif request.user.user_type == '2' or request.user.user_type == 'employee' %}
               Employee
             {% else %}
               Unknown
