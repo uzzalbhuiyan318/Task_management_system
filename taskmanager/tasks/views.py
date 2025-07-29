@@ -37,6 +37,8 @@ def serialize_task(task):
         'priority_class': priority_class,
         'status': task.status,
         'due_date': task.due_date.strftime('%Y-%m-%d'),
+        'comment': task.comment,
+        # 'file': task.file,
     }
     
 def home(request):
@@ -44,12 +46,14 @@ def home(request):
 
 @login_required
 def task_list(request):
+    # Determine base template
     if request.user.is_authenticated and (
         request.user.user_type == '1' or str(request.user.user_type).lower() == 'admin'
     ):
         base_template = 'admin/admin_base.html'
-        
-    elif request.user.is_authenticated and (request.user.user_type == '2' or str(request.user.user_type).lower() == 'employee'):
+    elif request.user.is_authenticated and (
+        request.user.user_type == '2' or str(request.user.user_type).lower() == 'employee'
+    ):
         base_template = 'admin/admin_base.html'
     else:
         base_template = 'base.html'
@@ -57,13 +61,16 @@ def task_list(request):
     tasks = Task.objects.all()
     form = TaskForm()
 
+    # ✅ Get status choices from model
+    status_choices = Task._meta.get_field('status').choices
+
     context = {
         'tasks': tasks,
         'form': form,
-        'base_template': base_template
+        'base_template': base_template,
+        'status_choices': status_choices,
     }
 
-    # ✅ Pass single context dictionary
     return render(request, 'task_list.html', context)
 
 @login_required
@@ -110,7 +117,9 @@ def jqgrid_tasks(request):
                 task.priority,
                 task.status,
                 task.due_date.strftime('%Y-%m-%d'),
-                task.id
+                task.id,
+                task.comment,
+                # task.file,
             ]} for task in paged_tasks
         ]
     }
@@ -152,7 +161,8 @@ def task_create(request):
 def task_detail(request, pk):
     task = get_object_or_404(Task, pk=pk)
     if is_ajax(request):
-        return JsonResponse({'success': True, 'task': serialize_task(task)})
+        status_choices = Task._meta.get_field('status').choices
+        return JsonResponse({'success': True, 'task': serialize_task(task), 'status_choices': status_choices})
     return JsonResponse({'success': False}, status=400)
 
 @login_required
@@ -165,6 +175,25 @@ def task_update(request, pk):
             return JsonResponse({'success': True})
         return JsonResponse({'success': False, 'errors': form.errors}, status=400)
     return JsonResponse({'success': False}, status=400)
+
+@login_required
+def update_task_status(request, pk):
+    if not is_ajax(request) or request.method != 'POST':
+        return JsonResponse({'success': False, 'error': 'Invalid request'}, status=400)
+
+    task = get_object_or_404(Task, pk=pk)
+    new_status = request.POST.get('status')
+
+    if not new_status:
+        return JsonResponse({'success': False, 'error': 'Status not provided'}, status=400)
+
+    # Basic permission check: allow admin or assigned user to change status
+    if not (request.user.is_staff or task.assigned_to == request.user):
+         raise PermissionDenied
+
+    task.status = new_status
+    task.save()
+    return JsonResponse({'success': True})
 
 @login_required
 def task_delete(request, pk):

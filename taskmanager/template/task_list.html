@@ -67,7 +67,7 @@
               class="btn btn-primary"
               data-bs-toggle="modal"
               data-bs-target="#addTaskModal">
-              <i class="bi bi-plus-circle me-1"></i> Add New Task
+              <i class="bi bi-plus-circle me-1"></i> Create Task
             </button>
             
           {% endif %}
@@ -77,7 +77,7 @@
               class="btn btn-primary"
               data-bs-toggle="modal"
               data-bs-target="#addTaskModal">
-              <i class="bi bi-plus-circle me-1"></i> Add New Task
+              <i class="bi bi-plus-circle me-1"></i> Create Task
             </button>       
         {% endif %}
       </div>
@@ -129,7 +129,7 @@
         <div class="modal-content">
           <div class="modal-header bg-primary text-white">
             <h5 class="modal-title">
-              <i class="bi bi-plus-circle-fill me-2"></i>Add a New Task
+              <i class="bi bi-plus-circle-fill me-2"></i>Create Task
             </h5>
             <button
               type="button"
@@ -242,13 +242,37 @@
           </div>
           <div class="modal-body" id="viewTaskModalBody"></div>
           <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              data-bs-dismiss="modal"
-            >
-              Close
-            </button>
+            
+            {% if user.is_authenticated %}
+              
+              {% if user.user_type == '2' or user.user_type == 'employee' %}
+                <button
+                type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal">
+                Close
+                </button>
+                <button type="button" id="saveStatusBtn" class="btn btn-primary">
+                  Save Changes
+                </button>
+              {% endif %}
+
+              
+              {% if user.user_type == '1' or user.user_type == 'admin' %}
+                <button
+                  type="button"
+                  class="btn btn-secondary"
+                  data-bs-dismiss="modal">
+                  Close
+                </button>
+                
+              {% endif %}
+                
+              
+                
+              
+            {% endif %}
+              
           </div>
         </div>
       </div>
@@ -420,6 +444,7 @@
         const taskDetailUrl = "{% url 'tasks:task_detail' 0 %}";
         const taskUpdateUrl = "{% url 'tasks:task_update' 0 %}";
         const taskDeleteUrl = "{% url 'tasks:task_delete' 0 %}";
+        const statusUpdateUrl = "{% url 'tasks:update_task_status' 0 %}";
 
         // Helper to add Bootstrap class to Django form fields
         $("#addTaskForm")
@@ -430,7 +455,24 @@
           // **FIX:** Get the task ID from options.rowId, not rowObject.id
           var taskId = options.rowId;
           var viewBtn = `<button type="button" class="btn btn-sm btn-info view-btn" data-task-id="${taskId}" title="View"><i class="bi bi-eye"></i></button>`;
-          var editBtn = `<button type="button" class="btn btn-sm btn-warning edit-btn" data-task-id="${taskId}" title="Edit"><i class="bi bi-pencil"></i></button>`;
+          
+          {% if user.is_authenticated %}
+            
+            {% if user.user_type == '1' or user.user_type == 'admin' %}
+              var editBtn = `<button type="button" class="btn btn-sm btn-warning edit-btn" data-task-id="${taskId}" title="Edit"><i class="bi bi-pencil"></i></button>`;
+  
+            {% endif %}
+            
+            
+            {% if user.user_type == '2' or user.user_type == 'employee' %}
+              var editBtn = `<button type="button" class="btn btn-sm btn-warning edit-btn disabled" data-task-id="${taskId}" title="Edit"><i class="bi bi-pencil"></i></button>`;
+            {% endif %}
+              
+
+
+          {% endif %}
+            
+         
           
           {% if user.is_authenticated %}
             
@@ -444,8 +486,6 @@
               
 
           {% endif %}
-            
-          {% comment %} var deleteBtn = `<button type="button" class="btn btn-sm btn-danger delete-btn" data-task-id="${taskId}" title="Delete"><i class="bi bi-trash"></i></button>`; {% endcomment %}
           return `<div class="action-btn-group">${viewBtn} ${editBtn} ${deleteBtn}</div>`;
         }
 
@@ -462,6 +502,7 @@
               { label: "Priority", name: "priority", width: 40 },
               { label: "Status", name: "status", width: 40 },
               { label: "Due Date", name: "due_date", width: 40 },
+
               {
                 label: "Actions",
                 name: "id",
@@ -547,21 +588,47 @@
             success: function (data) {
               if (data.success) {
                 const task = data.task;
+                const statusChoices = data.status_choices;
+
+                let statusDropdown = `<select id="view_status" class="form-select">`;
+                statusChoices.forEach(function (choice) {
+                  const selected = choice[0] === task.status ? "selected" : "";
+                  statusDropdown += `<option value="${choice[0]}" ${selected}>${choice[1]}</option>`;
+                });
+                statusDropdown += `</select>`;
+
                 $("#viewTaskModalBody").html(
-                  `<h4>${task.task_name}</h4><p class="text-muted">${
-                    task.description || "N/A"
-                  }</p><hr><div class="row"><div class="col-md-6"><p><strong>Assigned To:</strong> ${
+                  `<h4>${task.task_name}</h4>
+                  <p class="text-muted">${task.description || "N/A"}</p><hr>
+                  <div class="row"><div class="col-md-6"><p><strong>Assigned To:</strong> ${
                     task.assigned_to
-                  }</p></div><div class="col-md-6"><p><strong>Status:</strong> ${
-                    task.status
-                  }</p></div><div class="col-md-6"><p><strong>Priority:</strong> <span class="badge bg-${
+                  }</p></div>
+                  
+
+                  <div class="col-md-6 d-flex flex-row">
+                    <div class="">
+                      <strong >Status:</strong> 
+                    </div>
+                      
+                    <div class="mx-2">
+                      ${statusDropdown}
+                    </div>
+                    
+                  </div>
+
+                  
+                  <div class="col-md-6"><p><strong>Priority:</strong> <span class="badge bg-${
                     task.priority_class
                   }">${
                     task.priority
                   }</span></p></div><div class="col-md-6"><p><strong>Due Date:</strong> ${
                     task.due_date
+                  }</p></div></div><div class="col-md-6"><p><strong>Comment:</strong> ${
+                    task.comment
                   }</p></div></div>`
                 );
+                // Store task-id on the save button
+                $("#saveStatusBtn").data("task-id", task.id);
               }
             },
             error: function () {
@@ -571,6 +638,34 @@
             },
           });
         }
+
+        $("#saveStatusBtn").on("click", function () {
+          const taskId = $(this).data("task-id");
+          const newStatus = $("#view_status").val();
+
+          $.ajax({
+            url: statusUpdateUrl.replace("0", taskId),
+            method: "POST",
+            data: {
+              status: newStatus,
+              csrfmiddlewaretoken: "{{ csrf_token }}",
+            },
+            headers: {
+              "X-Requested-With": "XMLHttpRequest",
+            },
+            success: function (data) {
+              if (data.success) {
+                viewModal.hide();
+                grid.trigger("reloadGrid");
+              } else {
+                alert("Failed to update status: " + data.error);
+              }
+            },
+            error: function () {
+              alert("An unexpected error occurred while updating status.");
+            },
+          });
+        });
 
         {% comment %} Edit start here {% endcomment %}
 
