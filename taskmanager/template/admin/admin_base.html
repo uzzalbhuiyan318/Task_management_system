@@ -236,9 +236,12 @@
             setActiveLink();
 
             // Notification Logic
-            const notificationBadge = document.getElementById('message-notification-badge');
+           const notificationBadge = document.getElementById('message-notification-badge');
             function fetchUnreadCount() {
-                fetch("{% url 'messaging:unread_message_count' %}")
+                // **FIX: Add a unique timestamp to the URL to prevent browser caching**
+                const url = "{% url 'messaging:unread_message_count' %}?timestamp=" + new Date().getTime();
+                
+                fetch(url)
                     .then(response => response.ok ? response.json() : Promise.reject(response))
                     .then(data => {
                         if (data.unread_count > 0) {
@@ -251,7 +254,7 @@
                     .catch(error => console.error('Error fetching unread message count:', error));
             }
             fetchUnreadCount();
-            setInterval(fetchUnreadCount, 30000); 
+            setInterval(fetchUnreadCount, 5000); 
         });
     </script>
     {% block extra_scripts %}{% endblock %}
