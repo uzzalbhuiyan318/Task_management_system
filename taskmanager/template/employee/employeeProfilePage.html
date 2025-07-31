@@ -1,0 +1,125 @@
+{% extends "admin/admin_base.html" %}
+{% load static %}
+
+{% block content %}
+<style>
+  .profile-card {
+    border: none;
+    border-radius: 1.5rem;
+    background: #ffffff;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    padding: 2.5rem;
+    transition: all 0.3s ease-in-out;
+  }
+
+  .profile-card:hover {
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+  }
+
+  .profile-title {
+    font-weight: 700;
+    font-size: 1.75rem;
+  }
+
+  .admin-title {
+    color: #0d6efd;
+  }
+
+  .employee-title {
+    color: #198754;
+  }
+
+  .profile-label {
+    font-weight: 600;
+    color: #495057;
+  }
+
+  .profile-value {
+    font-size: 1rem;
+    color: #212529;
+  }
+
+  .profile-img {
+    width: 140px;
+    height: 140px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 4px solid #dee2e6;
+    box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .edit-btn {
+    font-weight: 600;
+    font-size: 1rem;
+    padding: 0.6rem 2rem;
+    border-radius: 10px;
+  }
+
+  @media (max-width: 768px) {
+    .profile-label {
+      text-align: left;
+    }
+  }
+</style>
+
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-6">
+      <div class="profile-card text-center">
+
+        {% if user.is_authenticated %}
+          {% if user.user_type == '1' or user.is_staff %}
+            <h2 class="profile-title admin-title mb-4">Admin Profile</h2>
+          {% elif user.user_type == '2' %}
+            <h2 class="profile-title employee-title mb-4">Employee Profile</h2>
+          {% endif %}
+        {% endif %}
+
+        <!-- Profile Image -->
+        <div class="mb-4">
+          <img src="{{ request.user.profile_pic.url }}"
+               alt="Profile Picture"
+               class="profile-img" />
+        </div>
+
+        <!-- User Info -->
+        <div class="text-start mb-3 row">
+          <label class="col-sm-4 profile-label">Username:</label>
+          <div class="col-sm-8 profile-value">{{ request.user.username }}</div>
+        </div>
+
+        <div class="text-start mb-3 row">
+          <label class="col-sm-4 profile-label">Email:</label>
+          <div class="col-sm-8 profile-value">{{ request.user.email }}</div>
+        </div>
+
+        <div class="text-start mb-3 row">
+          <label class="col-sm-4 profile-label">Contact No:</label>
+          <div class="col-sm-8 profile-value">{{ request.user.contact_no }}</div>
+        </div>
+
+        <div class="text-start mb-3 row">
+          <label class="col-sm-4 profile-label">User Type:</label>
+          <div class="col-sm-8 profile-value">
+            {% if request.user.user_type == '1' or request.user.user_type == 'admin' %}
+              Admin
+            {% elif request.user.user_type == '2' or request.user.user_type == 'employee' %}
+              Employee
+            {% else %}
+              Unknown
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Edit Button -->
+        <div class="text-center mt-4">
+          <a href="{% url 'tasks:edit_profile' %}" class="btn btn-warning edit-btn">
+            <i class="bi bi-pencil-square me-2"></i>Edit Profile
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

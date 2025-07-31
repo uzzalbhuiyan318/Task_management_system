@@ -28,7 +28,6 @@ def serialize_task(task):
     
     return {
         'id': task.id,
-        # **FIX:** Changed 'name' to 'task_name' to match JavaScript expectations
         'task_name': task.task_name,
         'description': task.description or "",
         'assigned_to': task.assigned_to.username if task.assigned_to else "N/A",
@@ -38,7 +37,7 @@ def serialize_task(task):
         'status': task.status,
         'due_date': task.due_date.strftime('%Y-%m-%d'),
         'comment': task.comment,
-        # 'file': task.file,
+        'upload': task.upload.url if task.upload else None,
     }
     
 def home(request):
@@ -61,7 +60,7 @@ def task_list(request):
     tasks = Task.objects.all()
     form = TaskForm()
 
-    # ✅ Get status choices from model
+    # Get status choices from model
     status_choices = Task._meta.get_field('status').choices
 
     context = {
@@ -79,12 +78,12 @@ def jqgrid_tasks(request):
     page = int(request.GET.get('page', 1))
     rows = int(request.GET.get('rows', 10))
     
-    tasks = Task.objects.all()
+    tasks = Task.objects.all().order_by('-id')
 
     # Filtering logic
     search_query = request.GET.get('search', '')
     if search_query:
-        tasks = tasks.filter(Q(task_name__icontains=search_query) | Q(assigned_to__icontains=search_query) | Q(email__icontains=search_query))
+        tasks = tasks.filter(Q(task_name__icontains=search_query) | Q(assigned_to__username__icontains=search_query) | Q(email__icontains=search_query))
     status_filter = request.GET.get('status', '')
     if status_filter:
         tasks = tasks.filter(status=status_filter)
@@ -105,45 +104,62 @@ def jqgrid_tasks(request):
     total_pages = paginator.num_pages
     paged_tasks = paginator.get_page(page)
     
+    # ✅ UPDATED: The 'rows' are now an array of objects matching the colModel names
+    response_rows = []
+    for task in paged_tasks:
+        response_rows.append({
+            'id': task.id,
+            'task_name': task.task_name,
+            'assigned_to': task.assigned_to.username if task.assigned_to else "N/A",
+            'email': task.email,
+            'priority': task.priority,
+            'status': task.status,
+            'due_date': task.due_date.strftime('%Y-%m-%d'),
+        })
+
     response = {
         'page': page,
         'total': total_pages,
         'records': total_records,
-        'rows': [
-            { 'id': task.id, 'cell': [
-                task.task_name,
-                task.assigned_to.username,
-                task.email,
-                task.priority,
-                task.status,
-                task.due_date.strftime('%Y-%m-%d'),
-                task.id,
-                task.comment,
-                # task.file,
-            ]} for task in paged_tasks
-        ]
+        'rows': response_rows
     }
     return JsonResponse(response)
 
+# In views.py
+
 @login_required
+@staff_member_required
 def task_create(request):
-    if request.method == "POST":
-        form = TaskForm(request.POST)
+    """Handles the creation of a new task via an AJAX POST request."""
+    if request.method == 'POST':
+        form = TaskForm(request.POST, request.FILES)
         if form.is_valid():
             task = form.save()
+
             # --- Start of Email Sending Logic ---
             subject = f'New Task Assigned: {task.task_name}'
 
-            # Render the HTML template with task context
-            html_message = render_to_string('email_notification.html', {'task': task})
+            # ✅ Build the full, absolute URL for the attachment
+            attachment_url = None
+            if task.upload:
+                attachment_url = request.build_absolute_uri(task.upload.url)
+
+            # ✅ Pass the new URL to the email template context
+            email_context = {
+                'task': task,
+                'attachment_url': attachment_url,
+            }
+            
+            # Render the HTML template with the new context
+            html_message = render_to_string('email_notification.html', email_context)
 
             # Create a plain text version of the email for compatibility
             plain_message = strip_tags(html_message)
 
-            from_email = 'uzzalbhuiyan905@gmail.com'
-            to_email = task.email 
+            from_email = 'uzzalbhuiyan905@gmail.com' # Change this
+            to_email = task.email
 
-            if to_email: 
+            if to_email:
                 send_mail(
                     subject,
                     plain_message,
@@ -155,7 +171,7 @@ def task_create(request):
             
             return JsonResponse({'success': True})
         return JsonResponse({'success': False, 'errors': form.errors}, status=400)
-    return JsonResponse({'success': False}, status=400)
+    return JsonResponse({'success': False, 'error': 'Invalid request method'}, status=405)
 
 @login_required
 def task_detail(request, pk):
@@ -168,8 +184,10 @@ def task_detail(request, pk):
 @login_required
 def task_update(request, pk):
     task = get_object_or_404(Task, pk=pk)
+    if not (request.user.is_staff or task.assigned_to == request.user):
+         raise PermissionDenied
     if request.method == "POST":
-        form = TaskEditForm(request.POST, instance=task)
+        form = TaskEditForm(request.POST, request.FILES, instance=task)
         if form.is_valid():
             form.save()
             return JsonResponse({'success': True})
@@ -198,6 +216,8 @@ def update_task_status(request, pk):
 @login_required
 def task_delete(request, pk):
     task = get_object_or_404(Task, pk=pk)
+    if not request.user.is_staff:
+         raise PermissionDenied
     if request.method == 'POST':
         task.delete()
         return JsonResponse({'success': True})
@@ -258,10 +278,11 @@ def loginPage(request):
                 else:
                     return redirect("tasks:home")
             else:
-                return redirect("tasks:registration")
+                # Provide feedback for failed login
+                return render(request, 'loginPage.html', {'error': 'Invalid credentials'})
         
         except CustomUser.DoesNotExist:
-            return redirect("tasks:task_list")
+            return redirect("tasks:registration")
     
     
     return render(request, 'loginPage.html')
@@ -271,16 +292,21 @@ def logoutPage(request):
     
     logout(request)
     
-    return render(request, "registration.html")
+    return redirect("tasks:loginPage")
 
 
 @login_required
 def AdminProfilePage(request):
+    profile = None
+    try:
+        if request.user.user_type == 'admin':
+            profile = request.user.admin
+        elif request.user.user_type == 'employee':
+            profile = request.user.employee.first()
+    except (AdminProfile.DoesNotExist, EmployeeProfile.DoesNotExist):
+        pass # profile is None
         
-    return render(request, "admin/AdminProfilePage.html")
-
-
-
+    return render(request, "admin/AdminProfilePage.html", {'profile': profile})
 
 @login_required
 def edit_profile(request):
@@ -288,62 +314,46 @@ def edit_profile(request):
     profile = None
     ProfileForm = None
 
-    # Check if the user is a superuser and create an admin profile if it doesn't exist
-    if user.is_superuser:
-        profile, created = AdminProfile.objects.get_or_create(username=user)
-        if created:
-            # Optionally set default values for the new admin profile
-            profile.role = 'Superuser'
-            profile.permissions = 'All'
-            profile.save()
-        ProfileForm = EditAdminForm
-    elif user.user_type == '1' or user.is_staff:
+    # Determine user type and get/create profile and form
+    if user.is_superuser or ((user.user_type == 'admin') or (user.user_type == '1')):
         profile, _ = AdminProfile.objects.get_or_create(username=user)
         ProfileForm = EditAdminForm
-        
-        
-    elif user.user_type == '2':
+    elif user.user_type == 'employee' or user.user_type == '2':
         profile, _ = EmployeeProfile.objects.get_or_create(username=user)
         ProfileForm = EditEmployeeForm
     else:
-        # Fallback for users with no defined user_type, redirect to a safe page
-        return redirect('tasks:task_list')
+        return redirect('tasks:home') 
 
     if request.method == 'POST':
         user_form = ProfileEditForm(request.POST, request.FILES, instance=user)
-        profile_form = ProfileForm(request.POST, instance=profile) if ProfileForm else None
+        profile_form = ProfileForm(request.POST, instance=profile)
 
-        if user_form.is_valid() and (profile_form is None or profile_form.is_valid()):
+        if user_form.is_valid() and profile_form.is_valid():
             user_form.save()
-            if profile_form:
-                profile_form.save()
-            return redirect('tasks:AdminProfilePage')
+            profile_form.save()
+            # Redirect based on user type
+            if user.user_type == 'admin' or user.user_type == '1':
+                return redirect('tasks:AdminProfilePage')
+            elif user.user_type == 'employee' or user.user_type == '2':
+                return redirect('tasks:employeeProfilePage')
 
     else:
         user_form = ProfileEditForm(instance=user)
-        profile_form = ProfileForm(instance=profile) if ProfileForm else None
+        profile_form = ProfileForm(instance=profile)
 
     return render(request, 'edit_profile.html', {
         'user_form': user_form,
         'profile_form': profile_form,
     })
        
-    
-    
 def login_required_view(request):
-        
     return render(request, 'login_required_view.html')
 
-
-
-
 # .....................................................
-#Admin Dashboard start here
-#......................................................
-
+# Admin Dashboard start here
+# ......................................................
 
 def admin_base(request):
-    
     return render(request, "admin/admin_base.html")
 
 @staff_member_required
@@ -352,8 +362,10 @@ def AdminDashboard(request):
     status_count = Counter(status_list)
     priority_list = Task.objects.values_list('priority', flat=True)
     priority_count = Counter(priority_list)
+    total_tasks = Task.objects.count()
 
     context = {
+        'total_tasks': total_tasks,
         'pending': status_count.get('Pending', 0),
         'inprogress': status_count.get('In Progress', 0),
         'completed': status_count.get('Completed', 0),
@@ -364,28 +376,32 @@ def AdminDashboard(request):
 
     return render(request, 'admin/AdminDashboard.html', context)
 
+# .....................................................
+# Employee panel start here
+# ......................................................
 
-# employee panel start here
-
+@login_required
 def employeeProfilePage(request):
-    
-    return render(request, 'employeeProfilePage.html')
-
+    profile = None
+    try:
+        profile = request.user.employee.first()
+    except EmployeeProfile.DoesNotExist:
+        pass
+    return render(request, 'employee/employeeProfilePage.html', {'profile': profile})
 
 @login_required
 def employeeDashboard(request):
     
     user = request.user
+    # if user.user_type != 'employee':
+    #     raise PermissionDenied
 
-    # Only query once for better performance
+    # Query tasks assigned to the current user
     user_tasks = Task.objects.filter(assigned_to=user)
     
     total_tasks = user_tasks.count()
-
-    # Count statuses and priorities
     status_list = user_tasks.values_list('status', flat=True)
     status_count = Counter(status_list)
-
     priority_list = user_tasks.values_list('priority', flat=True)
     priority_count = Counter(priority_list)
 
@@ -400,7 +416,3 @@ def employeeDashboard(request):
     }
 
     return render(request, 'employee/employeeDashboard.html', context)
-
-
-
-

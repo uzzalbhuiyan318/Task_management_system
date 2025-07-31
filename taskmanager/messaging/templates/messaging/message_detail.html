@@ -1,0 +1,23 @@
+{% extends 'admin/admin_base.html' %}
+
+{% block title %}Message{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header">
+            <h3 class="mb-0">{{ message.subject }}</h3>
+        </div>
+        <div class="card-body">
+            <p class="card-text"><strong>From:</strong> {{ message.sender.username }}</p>
+            <p class="card-text"><strong>To:</strong> {{ message.recipient.username }}</p>
+            <p class="card-text"><small class="text-muted">Received: {{ message.timestamp|date:"F d, Y, P" }}</small></p>
+            <hr>
+            <p class="card-text" style="white-space: pre-wrap;">{{ message.body }}</p>
+        </div>
+        <div class="card-footer text-end">
+            <a href="{% url 'messaging:inbox' %}" class="btn btn-secondary">Back to Inbox</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

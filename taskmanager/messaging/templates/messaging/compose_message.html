@@ -1,0 +1,23 @@
+{% extends 'admin/admin_base.html' %}
+
+{% block title %}Compose Message{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header">
+            <h3 class="mb-0">Compose New Message</h3>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <div class="text-end mt-3">
+                    <a href="{% url 'messaging:inbox' %}" class="btn btn-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-primary">Send Message</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

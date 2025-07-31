@@ -1,0 +1,30 @@
+{% extends 'admin/admin_base.html' %}
+
+{% block title %}Inbox{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Inbox</h1>
+        <a href="{% url 'messaging:compose' %}" class="btn btn-primary"><i class="bi bi-pencil-square me-2"></i>Compose Message</a>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="list-group list-group-flush">
+            {% for message in messages %}
+                <a href="{% url 'messaging:message_detail' message.id %}" class="list-group-item list-group-item-action {% if not message.is_read %}list-group-item-primary fw-bold{% endif %}">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">From: {{ message.sender.username }}</h5>
+                        <small>{{ message.timestamp|timesince }} ago</small>
+                    </div>
+                    <p class="mb-1">{{ message.subject }}</p>
+                </a>
+            {% empty %}
+                <div class="list-group-item">
+                    <p class="mb-0 text-center text-muted">Your inbox is empty.</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

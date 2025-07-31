@@ -5,75 +5,218 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Login to Your Account</title>
+    <title>Secure Login | Corporate Portal</title>
 
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
-      body {
-        background-color: #f8f9fa; /* Light gray background */
+      :root {
+        --primary-color: #2c3e50;
+        --secondary-color: #34495e;
+        --accent-color: #3498db;
+        --light-gray: #f8fafc;
+        --dark-gray: #7f8c8d;
       }
-
+      
+      body {
+        background-color: #f5f7fa;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        background-image: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
+      }
+      
       .login-container {
         min-height: 100vh;
         display: flex;
         align-items: center;
         justify-content: center;
+        padding: 2rem;
       }
-
+      
       .login-card {
         width: 100%;
-        max-width: 450px; /* Optimal width for a login form */
+        max-width: 420px;
         border: none;
-        border-radius: 1rem;
-        box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.1);
-        overflow: hidden; /* Ensures the border-radius is applied to child elements */
+        border-radius: 12px;
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
       }
-
+      
+      .login-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+      }
+      
       .login-card-header {
-        background-color: #0d6efd; /* Bootstrap primary blue */
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
         color: white;
-        padding: 2rem;
-        border-bottom: none;
+        padding: 2.5rem;
         text-align: center;
+        position: relative;
+        overflow: hidden;
       }
-
+      
+      .login-card-header::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 100%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+        transform: rotate(30deg);
+      }
+      
       .login-card-header h2 {
         margin-bottom: 0.5rem;
-        font-weight: 600;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        position: relative;
       }
-
+      
       .login-card-header p {
-        font-size: 0.9rem;
-        margin-bottom: 0;
         opacity: 0.9;
+        font-weight: 400;
+        font-size: 0.95rem;
+        position: relative;
       }
-
+      
       .login-card-body {
-        padding: 2rem 2.5rem;
+        padding: 2.5rem;
+        background-color: white;
       }
-
+      
       .form-label {
         font-weight: 600;
+        color: var(--secondary-color);
+        margin-bottom: 0.5rem;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
       }
-
+      
+      .form-control {
+        padding: 0.85rem 1.25rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        background-color: var(--light-gray);
+        font-size: 0.95rem;
+      }
+      
       .form-control:focus {
-        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
-        border-color: #86b7fe;
+        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        border-color: var(--accent-color);
+        background-color: white;
       }
-
+      
+      .input-group-text {
+        background-color: #f8fafc;
+        border: 1px solid #e2e8f0;
+        color: var(--dark-gray);
+      }
+      
       .btn-login {
+        background: linear-gradient(135deg, var(--accent-color) 0%, #2980b9 100%);
+        border: none;
+        padding: 1rem;
         font-weight: 600;
-        padding: 0.75rem 1.5rem;
-        font-size: 1rem;
+        letter-spacing: 0.5px;
+        border-radius: 8px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        text-transform: uppercase;
+        font-size: 0.9rem;
+        width: 100%;
+        position: relative;
+        overflow: hidden;
       }
-
+      
+      .btn-login::after {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -60%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(
+          to right,
+          rgba(255, 255, 255, 0.13) 0%,
+          rgba(255, 255, 255, 0.13) 77%,
+          rgba(255, 255, 255, 0.5) 92%,
+          rgba(255, 255, 255, 0.0) 100%
+        );
+        transform: rotate(30deg);
+      }
+      
+      .btn-login:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(52, 152, 219, 0.25);
+      }
+      
+      .btn-login:hover::after {
+        animation: shine 1.5s ease;
+      }
+      
+      @keyframes shine {
+        100% {
+          left: 125%;
+        }
+      }
+      
       .extra-links {
         text-align: center;
         margin-top: 1.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #edf2f7;
+      }
+      
+      .login-link {
+        color: var(--accent-color);
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.2s ease;
+      }
+      
+      .login-link:hover {
+        color: #2980b9;
+        text-decoration: underline;
+      }
+      
+      .footer-note {
+        font-size: 0.75rem;
+        color: var(--dark-gray);
+        text-align: center;
+        margin-top: 1.5rem;
+      }
+      
+      .remember-me {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin: 1.5rem 0;
+      }
+      
+      .forgot-password {
+        font-size: 0.85rem;
+        color: var(--accent-color);
+        text-decoration: none;
+      }
+      
+      .forgot-password:hover {
+        text-decoration: underline;
+      }
+      
+      /* Responsive adjustments */
+      @media (max-width: 576px) {
+        .login-card-body {
+          padding: 2rem;
+        }
+        
+        .login-card-header {
+          padding: 2rem;
+        }
       }
     </style>
   </head>
@@ -81,46 +224,68 @@
     <div class="login-container">
       <div class="card login-card">
         <div class="login-card-header">
-          <h2>Welcome Back!</h2>
-          <p>Please enter your credentials to log in.</p>
+          <h2>ENTERPRISE LOGIN</h2>
+          <p>Access your corporate account securely</p>
         </div>
-        <div class="card-body login-card-body">
+        <div class="login-card-body">
           <form method="POST" action="{% url 'tasks:loginPage' %}">
             {% csrf_token %}
 
             <div class="mb-4">
               <label for="username" class="form-label">Username</label>
-              <input
-                type="text"
-                class="form-control"
-                id="username"
-                name="username"
-                required
-              />
+              <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-user-tie"></i></span>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="username"
+                  name="username"
+                  placeholder="Enter your username"
+                  required
+                />
+              </div>
             </div>
 
             <div class="mb-4">
               <label for="password" class="form-label">Password</label>
-              <input
-                type="password"
-                class="form-control"
-                id="password"
-                name="password"
-                required
-              />
+              <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                <input
+                  type="password"
+                  class="form-control"
+                  id="password"
+                  name="password"
+                  placeholder="Enter your password"
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="remember-me">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="rememberMe">
+                <label class="form-check-label" for="rememberMe" style="font-size: 0.9rem;">
+                  Remember me
+                </label>
+              </div>
+              <a href="#" class="forgot-password">Forgot password?</a>
             </div>
 
             <div class="d-grid">
-              <button type="submit" class="btn btn-primary btn-login">
-                Login
+              <button type="submit" class="btn btn-login">
+                <i class="fas fa-sign-in-alt me-2"></i> SIGN IN
               </button>
             </div>
 
             <div class="extra-links">
-              <p>
-                Don't have an account?
-                <a href="{% url 'tasks:registration' %}">Register</a>
+              <p class="text-muted" style="font-size: 0.9rem;">
+                Don't have an account? 
+                <a href="{% url 'tasks:registration' %}" class="login-link">Request access</a>
               </p>
+            </div>
+
+            <div class="footer-note">
+              <p>Secure login with enterprise-grade encryption</p>
             </div>
           </form>
         </div>
@@ -132,134 +297,3 @@
 </html>
 
 {% endblock body %}
-
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Login to Your Account</title>
-
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-
-    <style>
-      body {
-        background-color: #f8f9fa; /* Light gray background */
-      }
-
-      .login-container {
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-
-      .login-card {
-        width: 100%;
-        max-width: 450px; /* Optimal width for a login form */
-        border: none;
-        border-radius: 1rem;
-        box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.1);
-        overflow: hidden; /* Ensures the border-radius is applied to child elements */
-      }
-
-      .login-card-header {
-        background-color: #0d6efd; /* Bootstrap primary blue */
-        color: white;
-        padding: 2rem;
-        border-bottom: none;
-        text-align: center;
-      }
-
-      .login-card-header h2 {
-        margin-bottom: 0.5rem;
-        font-weight: 600;
-      }
-
-      .login-card-header p {
-        font-size: 0.9rem;
-        margin-bottom: 0;
-        opacity: 0.9;
-      }
-
-      .login-card-body {
-        padding: 2rem 2.5rem;
-      }
-
-      .form-label {
-        font-weight: 600;
-      }
-
-      .form-control:focus {
-        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
-        border-color: #86b7fe;
-      }
-
-      .btn-login {
-        font-weight: 600;
-        padding: 0.75rem 1.5rem;
-        font-size: 1rem;
-      }
-
-      .extra-links {
-        text-align: center;
-        margin-top: 1.5rem;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="login-container">
-      <div class="card login-card">
-        <div class="login-card-header">
-          <h2>Welcome Back!</h2>
-          <p>Please enter your credentials to log in.</p>
-        </div>
-        <div class="card-body login-card-body">
-          <form method="POST" action="{% url 'tasks:loginPage' %}">
-            {% csrf_token %}
-
-            <div class="mb-4">
-              <label for="username" class="form-label">Username</label>
-              <input
-                type="text"
-                class="form-control"
-                id="username"
-                name="username"
-                required
-              />
-            </div>
-
-            <div class="mb-4">
-              <label for="password" class="form-label">Password</label>
-              <input
-                type="password"
-                class="form-control"
-                id="password"
-                name="password"
-                required
-              />
-            </div>
-
-            <div class="d-grid">
-              <button type="submit" class="btn btn-primary btn-login">
-                Login
-              </button>
-            </div>
-
-            <div class="extra-links">
-              <p>
-                Don't have an account?
-                <a href="{% url 'tasks:registration' %}">Register</a>
-              </p>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  </body>
-</html>

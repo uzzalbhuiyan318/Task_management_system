@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "tasks",
+    "messaging",
 ]
 
 AUTH_USER_MODEL = "tasks.CustomUser"
