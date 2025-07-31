@@ -4,6 +4,7 @@ from tasks.models import CustomUser
 from .forms import MessageForm
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
+from django.http import JsonResponse
 
 
 # Create your views here.
@@ -53,5 +54,15 @@ def compose_message(request):
         
 
     return render(request, 'messaging/compose_message.html', {'form': form})
+
+
+@login_required
+def unread_message_count(request):
+
+    if not request.user.is_authenticated:
+        return JsonResponse({'unread_count': 0})
+        
+    count = Message.objects.filter(recipient=request.user, is_read=False).count()
+    return JsonResponse({'unread_count': count})
         
     
