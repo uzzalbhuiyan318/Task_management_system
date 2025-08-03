@@ -1,30 +1,125 @@
 {% extends 'admin/admin_base.html' %}
 
-{% block title %}Inbox{% endblock %}
+{% block title %}Message Inbox{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
+<div class="container-fluid px-4 mt-4 p-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1>Inbox</h1>
-        <a href="{% url 'messaging:compose' %}" class="btn btn-primary"><i class="bi bi-pencil-square me-2"></i>Compose Message</a>
+        <div>
+            <h1 class="h3 mb-0 text-gray-800">Message Inbox</h1>
+            <nav aria-label="breadcrumb" class="mt-2">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'tasks:AdminDashboard' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Messages</li>
+                </ol>
+            </nav>
+        </div>
+        <a href="{% url 'messaging:compose' %}" class="btn btn-primary d-flex align-items-center">
+            <i class="bi bi-pencil-square me-2"></i>Compose
+        </a>
     </div>
 
-    <div class="card shadow-sm">
-        <div class="list-group list-group-flush">
-            {% for message in messages %}
-                <a href="{% url 'messaging:message_detail' message.id %}" class="list-group-item list-group-item-action {% if not message.is_read %}list-group-item-primary fw-bold{% endif %}">
-                    <div class="d-flex w-100 justify-content-between">
-                        <h5 class="mb-1">From: {{ message.sender.username }}</h5>
-                        <small>{{ message.timestamp|timesince }} ago</small>
-                    </div>
-                    <p class="mb-1">{{ message.subject }}</p>
-                </a>
-            {% empty %}
-                <div class="list-group-item">
-                    <p class="mb-0 text-center text-muted">Your inbox is empty.</p>
-                </div>
-            {% endfor %}
+    <div class="card shadow border-0 inbox-card">
+        <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Received Messages</h6>
+            <div class="dropdown">
+                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="inboxActions" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-gear"></i> Actions
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="inboxActions">
+                    <li><a class="dropdown-item" href="#"><i class="bi bi-check-circle me-2"></i>Mark all as read</a></li>
+                    <li><a class="dropdown-item" href="#"><i class="bi bi-trash me-2"></i>Delete selected</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="#"><i class="bi bi-archive me-2"></i>Archive</a></li>
+                </ul>
+            </div>
         </div>
+        
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th width="40"><input type="checkbox" class="form-check-input"></th>
+                            <th>Sender</th>
+                            <th>Subject</th>
+                            <th>Preview</th>
+                            <th class="text-end">Received</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for message in messages %}
+                        <tr class="{% if not message.is_read %}table-primary{% endif %}" onclick="window.location='{% url 'messaging:message_detail' message.id %}'" style="cursor: pointer;">
+                            <td><input type="checkbox" class="form-check-input"></td>
+                            <td class="fw-bold">{{ message.sender.get_full_name|default:message.sender.username }}</td>
+                            <td>{{ message.subject }}</td>
+                            <td class="text-muted text-truncate" style="max-width: 200px;">{{ message.body|truncatechars:60 }}</td>
+                            <td class="text-end">
+                                <small class="text-muted">{{ message.timestamp|date:"M d, Y H:i" }}</small>
+                                {% if not message.is_read %}<span class="badge bg-primary ms-2">New</span>{% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center py-4">
+                                <i class="bi bi-envelope-open display-5 text-muted mb-3"></i>
+                                <p class="h5 text-muted">Your inbox is empty</p>
+                                <p class="text-muted">No messages have been received yet</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        {% if messages.has_other_pages %}
+        <div class="card-footer bg-white border-top py-3">
+            <nav aria-label="Message pagination">
+                <ul class="pagination justify-content-center mb-0">
+                    {% if messages.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ messages.previous_page_number }}" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                    
+                    {% for i in messages.paginator.page_range %}
+                    <li class="page-item {% if messages.number == i %}active{% endif %}">
+                        <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+                    </li>
+                    {% endfor %}
+                    
+                    {% if messages.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ messages.next_page_number }}" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+        {% endif %}
     </div>
 </div>
+
+<style>
+    .table-hover tbody tr:hover {
+        background-color: rgba(0, 0, 0, 0.02);
+    }
+    .card {
+        border-radius: 0.5rem;
+    }
+    .breadcrumb {
+        background-color: transparent;
+        padding: 0;
+    }
+    .inbox-card{
+        padding-left: 5px;
+        padding-right: 5px;
+        padding-bottom: 5px;
+    }
+</style>
 {% endblock %}

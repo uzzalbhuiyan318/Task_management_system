@@ -1,23 +1,93 @@
 {% extends 'admin/admin_base.html' %}
 
-{% block title %}Message{% endblock %}
+{% block title %}Message: {{ message.subject|truncatechars:30 }}{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <div class="card shadow-sm">
-        <div class="card-header">
-            <h3 class="mb-0">{{ message.subject }}</h3>
+<div class="container-fluid px-4 mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0 text-gray-800">Message Details</h1>
+            <nav aria-label="breadcrumb" class="mt-2">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'tasks:AdminDashboard' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'messaging:inbox' %}">Inbox</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Message</li>
+                </ol>
+            </nav>
         </div>
-        <div class="card-body">
-            <p class="card-text"><strong>From:</strong> {{ message.sender.username }}</p>
-            <p class="card-text"><strong>To:</strong> {{ message.recipient.username }}</p>
-            <p class="card-text"><small class="text-muted">Received: {{ message.timestamp|date:"F d, Y, P" }}</small></p>
-            <hr>
-            <p class="card-text" style="white-space: pre-wrap;">{{ message.body }}</p>
-        </div>
-        <div class="card-footer text-end">
-            <a href="{% url 'messaging:inbox' %}" class="btn btn-secondary">Back to Inbox</a>
+        <div class="btn-group">
+            <a href="{% url 'messaging:inbox' %}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-1"></i> Back to Inbox
+            </a>
+            <button class="btn btn-outline-danger">
+                <i class="bi bi-trash"></i>
+            </button>
+            <button class="btn btn-outline-primary">
+                <i class="bi bi-reply"></i>
+            </button>
         </div>
     </div>
+
+    <div class="card shadow border-0 mb-4">
+        <div class="card-header bg-white border-bottom py-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">{{ message.subject }}</h4>
+                <span class="badge bg-light text-dark">
+                    <i class="bi bi-clock me-1"></i>{{ message.timestamp|date:"M d, Y h:i A" }}
+                </span>
+            </div>
+        </div>
+        
+        <div class="card-body">
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-primary bg-opacity-10 rounded-circle p-3 me-3">
+                            <i class="bi bi-person-fill text-primary fs-4"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-1 text-muted">From</h6>
+                            <p class="mb-0 fw-bold">{{ message.sender.get_full_name|default:message.sender.username }}</p>
+                            <small class="text-muted">{{ message.sender.email }}</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mt-3 mt-md-0">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-success bg-opacity-10 rounded-circle p-3 me-3">
+                            <i class="bi bi-person text-success fs-4"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-1 text-muted">To</h6>
+                            <p class="mb-0 fw-bold">{{ message.recipient.get_full_name|default:message.recipient.username }}</p>
+                            <small class="text-muted">{{ message.recipient.email }}</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="my-4">
+
+            <div class="message-content bg-light rounded p-4">
+                <div style="white-space: pre-wrap; font-family: 'Segoe UI', Roboto, sans-serif;">{{ message.body }}</div>
+            </div>
+        </div>
+
+    </div>
+
 </div>
+
+<style>
+    .message-content {
+        min-height: 200px;
+        line-height: 1.6;
+    }
+    .breadcrumb {
+        background-color: transparent;
+        padding: 0;
+    }
+    .card {
+        border-radius: 0.5rem;
+    }
+</style>
 {% endblock %}

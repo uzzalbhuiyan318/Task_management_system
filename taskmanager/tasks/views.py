@@ -6,6 +6,7 @@ from django.core.paginator import Paginator
 from django.db.models import Q
 from .models import *
 from .forms import *
+from messaging.models import Message
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
@@ -19,24 +20,18 @@ def is_ajax(request):
     return request.headers.get('x-requested-with') == 'XMLHttpRequest'
 
 def serialize_task(task):
-    """ Helper function to convert a Task object to a dictionary """
-    priority_class = 'success'
-    if task.priority == 'High':
-        priority_class = 'danger'
-    elif task.priority == 'Medium':
-        priority_class = 'warning text-dark'
-    
     return {
         'id': task.id,
         'task_name': task.task_name,
         'description': task.description or "",
         'assigned_to': task.assigned_to.username if task.assigned_to else "N/A",
+        'assigned_to_id': task.assigned_to.id if task.assigned_to else None,
         'email': task.email,
         'priority': task.priority,
-        'priority_class': priority_class,
+        'priority_class': 'danger' if task.priority == 'High' else ('warning text-dark' if task.priority == 'Medium' else 'success'),
         'status': task.status,
         'due_date': task.due_date.strftime('%Y-%m-%d'),
-        'comment': task.comment,
+        'comment': task.comment or "",
         'upload': task.upload.url if task.upload else None,
     }
     
@@ -56,7 +51,8 @@ def task_list(request):
         base_template = 'admin/admin_base.html'
     else:
         base_template = 'base.html'
-    
+
+
     tasks = Task.objects.all()
     form = TaskForm()
 
@@ -79,6 +75,8 @@ def jqgrid_tasks(request):
     rows = int(request.GET.get('rows', 10))
     
     tasks = Task.objects.all().order_by('-id')
+    if request.user.user_type == '2' or request.user.user_type == 'employee':
+        tasks = tasks.filter(assigned_to=request.user)
 
     # Filtering logic
     search_query = request.GET.get('search', '')
@@ -196,21 +194,39 @@ def task_update(request, pk):
 
 @login_required
 def update_task_status(request, pk):
+    """
+    Handles status and comment updates from employees and sends a notification to admins.
+    """
     if not is_ajax(request) or request.method != 'POST':
         return JsonResponse({'success': False, 'error': 'Invalid request'}, status=400)
 
     task = get_object_or_404(Task, pk=pk)
+    
+    # Permission check: only the assigned employee can update
+    if task.assigned_to != request.user and not request.user.is_staff:
+         raise PermissionDenied
+
     new_status = request.POST.get('status')
+    comment = request.POST.get('comment', '')
 
     if not new_status:
         return JsonResponse({'success': False, 'error': 'Status not provided'}, status=400)
 
-    # Basic permission check: allow admin or assigned user to change status
-    if not (request.user.is_staff or task.assigned_to == request.user):
-         raise PermissionDenied
-
     task.status = new_status
+    task.comment = comment # Save the new comment
     task.save()
+
+    # **FIX 3: Send a message notification to all admins**
+    if request.user.user_type == '2' or request.user.user_type == 'employee':
+        admins = CustomUser.objects.filter(Q(user_type='1') | Q(user_type='admin'))
+        for admin in admins:
+            Message.objects.create(
+                sender=request.user,
+                recipient=admin,
+                subject=f"Task Updated: {task.task_name}",
+                body=f"The task '{task.task_name}' has been updated by {request.user.username}.\n\nNew Status: {new_status}\n\nComment:\n{comment}"
+            )
+
     return JsonResponse({'success': True})
 
 @login_required

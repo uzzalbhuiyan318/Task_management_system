@@ -4,19 +4,63 @@
 
 {% block content %}
 <div class="container mt-4">
-    <div class="card shadow-sm">
-        <div class="card-header">
-            <h3 class="mb-0">Compose New Message</h3>
-        </div>
-        <div class="card-body">
-            <form method="post">
-                {% csrf_token %}
-                {{ form.as_p }}
-                <div class="text-end mt-3">
-                    <a href="{% url 'messaging:inbox' %}" class="btn btn-secondary">Cancel</a>
-                    <button type="submit" class="btn btn-primary">Send Message</button>
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0"><i class="bi bi-pencil-square me-2"></i>Compose New Message</h3>
                 </div>
-            </form>
+                <div class="card-body p-4">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+
+                        <!-- Display any form errors here -->
+                        {% if form.errors %}
+                            <div class="alert alert-danger">
+                                Please correct the errors below.
+                            </div>
+                        {% endif %}
+
+                        <!-- Recipient Field -->
+                        <div class="mb-3">
+                            <label for="{{ form.recipient.id_for_label }}" class="form-label"><strong>To:</strong></label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-person-fill"></i></span>
+                                {{ form.recipient }}
+                            </div>
+                            {% if form.recipient.errors %}
+                                <div class="text-danger mt-1"><small>{{ form.recipient.errors.as_text }}</small></div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Subject Field -->
+                        <div class="mb-3">
+                            <label for="{{ form.subject.id_for_label }}" class="form-label"><strong>Subject:</strong></label>
+                             <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-card-heading"></i></span>
+                                {{ form.subject }}
+                            </div>
+                            {% if form.subject.errors %}
+                                <div class="text-danger mt-1"><small>{{ form.subject.errors.as_text }}</small></div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Body Field -->
+                        <div class="mb-3">
+                            <label for="{{ form.body.id_for_label }}" class="form-label"><strong>Message:</strong></label>
+                            {{ form.body }}
+                            {% if form.body.errors %}
+                                <div class="text-danger mt-1"><small>{{ form.body.errors.as_text }}</small></div>
+                            {% endif %}
+                        </div>
+
+                        <div class="text-end mt-4">
+                            <a href="{% url 'messaging:inbox' %}" class="btn btn-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary"><i class="bi bi-send-fill me-1"></i> Send Message</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 </div>
