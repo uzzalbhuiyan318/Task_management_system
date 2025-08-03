@@ -268,6 +268,7 @@
                 buttons += `<button type="button" class="btn btn-sm btn-warning edit-btn" data-task-id="${taskId}" title="Edit"><i class="bi bi-pencil"></i></button> `;
                 buttons += `<button type="button" class="btn btn-sm btn-danger delete-btn" data-task-id="${taskId}" title="Delete"><i class="bi bi-trash"></i></button>`;
             } else {
+                buttons += `<button type="button" class="btn btn-sm btn-info view-btn" data-task-id="${taskId}" title="View"><i class="bi bi-eye"></i></button> `;
                 // Employee button
                 buttons += `<button type="button" class="btn btn-sm btn-success update-btn" data-task-id="${taskId}" title="Update Status"><i class="bi bi-check2-square"></i> Update</button>`;
             }
@@ -418,7 +419,7 @@
         $("#saveUpdateBtn").on("click", function () {
             const taskId = $(this).data("task-id");
             const newStatus = $("#update_status").val();
-            const comment = $("#update_comment").val(); // Get comment value
+            const comment = $("#update_comment").val(); 
 
             $(this).prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Submitting...');
 
