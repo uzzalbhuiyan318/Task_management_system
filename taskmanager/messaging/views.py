@@ -10,10 +10,17 @@ from django.http import JsonResponse
 # Create your views here.
 @login_required
 def inbox(request):
-    
-    messages = Message.objects.filter(recipient = request.user)
-    return render(request, 'messaging/inbox.html', {'messages': messages})
+    # This query now fetches all messages EXCEPT for work updates
+    messages_for_inbox = Message.objects.filter(
+        recipient=request.user
+    ).exclude(
+        subject__startswith='Task Updated:'
+    ).order_by('-id')
 
+    context = {
+        'messages': messages_for_inbox,
+    }
+    return render(request, 'messaging/inbox.html', context) # Use your actual template path
 
 from django.shortcuts import get_object_or_404
 
@@ -26,6 +33,7 @@ def message_detail(request, message_id):
         message.save()
         
     return render(request, 'messaging/message_detail.html', {'message': message})
+
 
 
 @login_required
@@ -58,11 +66,17 @@ def compose_message(request):
 
 @login_required
 def unread_message_count(request):
-
     if not request.user.is_authenticated:
         return JsonResponse({'unread_count': 0})
-        
-    count = Message.objects.filter(recipient=request.user, is_read=False).count()
+
+    # This query now counts unread messages EXCEPT for work updates
+    count = Message.objects.filter(
+        recipient=request.user, 
+        is_read=False
+    ).exclude(
+        subject__startswith='Task Updated:'
+    ).count()
+    
     return JsonResponse({'unread_count': count})
         
     

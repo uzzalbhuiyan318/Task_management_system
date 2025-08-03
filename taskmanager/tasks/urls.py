@@ -23,4 +23,6 @@ urlpatterns = [
     path('admin_base/', admin_base, name='admin_base'),
     path('employeeProfilePage/', employeeProfilePage, name='employeeProfilePage'),
     path('employeeDashboard/', employeeDashboard, name='employeeDashboard'),
+    path('work-updates/', work_updates, name='work_updates'),
+    path('work_update_count/',work_update_count, name='work_update_count'),
 ]

@@ -1,0 +1,49 @@
+{% extends 'admin/admin_base.html' %}
+
+{% block title %}Work Updates{% endblock %}
+
+{% block content %}
+<style>
+    .update-card {
+        border-left: 5px solid #0d6efd;
+        transition: box-shadow 0.3s ease;
+    }
+    .update-card:hover {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .update-body {
+        white-space: pre-wrap; /* This preserves newlines from the database */
+        background-color: #f8f9fa;
+        padding: 1rem;
+        border-radius: 5px;
+    }
+</style>
+
+<div class="container-fluid">
+    <h1 class="h3 mb-4 text-gray-800">Work Updates</h1>
+    <p class="mb-4">Here are the latest task status and comment updates submitted by employees.</p>
+
+    <div class="list-group">
+        {% for update in updates %}
+            <div class="card update-card mb-3">
+                <div class="card-body">
+                    <div class="d-flex w-100 justify-content-between mb-2">
+                        <h5 class="card-title mb-0">{{ update.subject }}</h5>
+                        {% if update.timestamp %} {# Assumes your Message model has a 'timestamp' field #}
+                            <small class="text-muted">{{ update.timestamp|date:"d M Y, h:i A" }}</small>
+                        {% endif %}
+                    </div>
+                    
+                    <p class="card-text update-body">{{ update.body }}</p>
+
+                    <small class="text-muted">Submitted by: <strong>{{ update.sender.username }}</strong></small>
+                </div>
+            </div>
+        {% empty %}
+            <div class="alert alert-info text-center" role="alert">
+              There are no new work updates to display.
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

@@ -6,7 +6,6 @@
     <title>{% block title %}Admin Panel{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -135,10 +134,8 @@
 </head>
 <body>
     <div class="d-flex">
-        <!-- Sidebar -->
         <div class="sidebar d-flex flex-column p-3" id="sidebar">
             <div>
-                <!-- **FIXED:** Header layout is cleaner and toggle is aligned -->
                 <div class="sidebar-header d-flex justify-content-between align-items-center mb-4">
                     <h5 class="m-0">
                         <button id="sidebar-toggle" class="fs-4"><i class="bi bi-list"></i></button> <span>TaskManager</span>
@@ -150,12 +147,23 @@
                     {% if user.is_authenticated %}
                         {% if user.user_type == '1' or user.user_type == 'admin' %}
                             <li><a href="{% url 'tasks:AdminDashboard' %}" class="sidebar-link"><i class="bi bi-grid-1x2-fill"></i> <span>Dashboard</span></a></li>
+                            
+                            <li>
+                                <a href="{% url 'tasks:work_updates' %}" class="sidebar-link">
+                                    <i class="bi bi-bell-fill"></i> 
+                                    <span>Work Updates</span>
+                                    <span class="badge bg-primary rounded-pill notification-badge" id="work-update-badge" style="display: none;"></span>
+                                </a>
+                            </li>
+
                         {% elif user.user_type == '2' or user.user_type == 'employee' %}
                              <li><a href="{% url 'tasks:employeeDashboard' %}" class="sidebar-link"><i class="bi bi-grid-1x2-fill"></i> <span>Dashboard</span></a></li>
                         {% endif %}
                     {% endif %}
+
                     <li><a href="{% url 'tasks:task_list' %}" class="sidebar-link"><i class="bi bi-list-task"></i> <span>Task List</span></a></li>
                     <li><a href="{% url 'tasks:AdminProfilePage' %}" class="sidebar-link"><i class="bi bi-person-circle"></i> <span>Profile</span></a></li>
+                    
                     <li>
                         <a href="{% url 'messaging:inbox' %}" class="sidebar-link">
                             <i class="bi bi-envelope-fill"></i> 
@@ -173,17 +181,14 @@
             </div>
         </div>
 
-        <!-- Main Content Wrapper -->
         <div class="main-content-wrapper" id="main-content">
             <main class="p-4">
                  {% block content %}
-                <!-- Page content will be injected here -->
                 {% endblock %}
             </main>
         </div>
     </div>
 
-    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -194,7 +199,6 @@
             const mainContent = document.getElementById('main-content');
             const sidebarLinks = document.querySelectorAll('.sidebar-link');
 
-            // Function to set the active link
             function setActiveLink() {
                 const currentPath = window.location.pathname;
                 sidebarLinks.forEach(link => {
@@ -205,13 +209,11 @@
                 });
             }
             
-            // Check localStorage on page load to set the initial state
             if (localStorage.getItem('sidebarCollapsed') === 'true') {
                 sidebar.classList.add('collapsed');
                 mainContent.classList.add('collapsed');
             }
 
-            // Toggle button click listener
             if (sidebarToggle) {
                 sidebarToggle.addEventListener('click', function(e) {
                     e.preventDefault();
@@ -221,24 +223,22 @@
                 });
             }
 
-            // **FIXED:** Add click listeners to all sidebar links
             sidebarLinks.forEach(link => {
                 link.addEventListener('click', function() {
-                    // If the sidebar is collapsed when a link is clicked...
                     if (sidebar.classList.contains('collapsed')) {
-                        // ...update localStorage to make sure the next page loads with an expanded sidebar.
                         localStorage.setItem('sidebarCollapsed', 'false');
                     }
                 });
             });
 
-            // Set the active link on initial load
             setActiveLink();
 
-            // Notification Logic
-           const notificationBadge = document.getElementById('message-notification-badge');
+            // --- Notification Logic ---
+
+            // 1. For General Messages
+            const notificationBadge = document.getElementById('message-notification-badge');
             function fetchUnreadCount() {
-                // **FIX: Add a unique timestamp to the URL to prevent browser caching**
+                if (!notificationBadge) return;
                 const url = "{% url 'messaging:unread_message_count' %}?timestamp=" + new Date().getTime();
                 
                 fetch(url)
@@ -255,6 +255,28 @@
             }
             fetchUnreadCount();
             setInterval(fetchUnreadCount, 5000); 
+
+            // 2. UPDATED: Logic for Work Updates Badge
+            const workUpdateBadge = document.getElementById('work-update-badge');
+            function fetchWorkUpdateCount() {
+                // This function only runs if the badge element exists (i.e., for admins)
+                if (!workUpdateBadge) return; 
+                const url = "{% url 'tasks:work_update_count' %}?timestamp=" + new Date().getTime();
+                
+                fetch(url)
+                    .then(response => response.ok ? response.json() : Promise.reject(response))
+                    .then(data => {
+                        if (data.update_count > 0) {
+                            workUpdateBadge.textContent = data.update_count;
+                            workUpdateBadge.style.display = 'inline-block';
+                        } else {
+                            workUpdateBadge.style.display = 'none';
+                        }
+                    })
+                    .catch(error => console.error('Error fetching work update count:', error));
+            }
+            fetchWorkUpdateCount();
+            setInterval(fetchWorkUpdateCount, 5000);
         });
     </script>
     {% block extra_scripts %}{% endblock %}

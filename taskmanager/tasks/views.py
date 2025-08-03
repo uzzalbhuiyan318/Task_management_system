@@ -102,7 +102,6 @@ def jqgrid_tasks(request):
     total_pages = paginator.num_pages
     paged_tasks = paginator.get_page(page)
     
-    # ✅ UPDATED: The 'rows' are now an array of objects matching the colModel names
     response_rows = []
     for task in paged_tasks:
         response_rows.append({
@@ -123,7 +122,6 @@ def jqgrid_tasks(request):
     }
     return JsonResponse(response)
 
-# In views.py
 
 @login_required
 @staff_member_required
@@ -134,27 +132,19 @@ def task_create(request):
         if form.is_valid():
             task = form.save()
 
-            # --- Start of Email Sending Logic ---
             subject = f'New Task Assigned: {task.task_name}'
-
-            # ✅ Build the full, absolute URL for the attachment
             attachment_url = None
             if task.upload:
                 attachment_url = request.build_absolute_uri(task.upload.url)
 
-            # ✅ Pass the new URL to the email template context
             email_context = {
                 'task': task,
                 'attachment_url': attachment_url,
             }
             
-            # Render the HTML template with the new context
             html_message = render_to_string('email_notification.html', email_context)
-
-            # Create a plain text version of the email for compatibility
             plain_message = strip_tags(html_message)
-
-            from_email = 'uzzalbhuiyan905@gmail.com' # Change this
+            from_email = 'your-email@example.com' # Change this
             to_email = task.email
 
             if to_email:
@@ -165,7 +155,6 @@ def task_create(request):
                     [to_email],
                     html_message=html_message
                 )
-            # --- End of Email Sending Logic ---
             
             return JsonResponse({'success': True})
         return JsonResponse({'success': False, 'errors': form.errors}, status=400)
@@ -196,13 +185,13 @@ def task_update(request, pk):
 def update_task_status(request, pk):
     """
     Handles status and comment updates from employees and sends a notification to admins.
+    This creates a message that will be visible in the "Work Updates" section.
     """
     if not is_ajax(request) or request.method != 'POST':
         return JsonResponse({'success': False, 'error': 'Invalid request'}, status=400)
 
     task = get_object_or_404(Task, pk=pk)
     
-    # Permission check: only the assigned employee can update
     if task.assigned_to != request.user and not request.user.is_staff:
          raise PermissionDenied
 
@@ -213,10 +202,9 @@ def update_task_status(request, pk):
         return JsonResponse({'success': False, 'error': 'Status not provided'}, status=400)
 
     task.status = new_status
-    task.comment = comment # Save the new comment
+    task.comment = comment
     task.save()
 
-    # **FIX 3: Send a message notification to all admins**
     if request.user.user_type == '2' or request.user.user_type == 'employee':
         admins = CustomUser.objects.filter(Q(user_type='1') | Q(user_type='admin'))
         for admin in admins:
@@ -241,8 +229,8 @@ def task_delete(request, pk):
 
 
 def registration(request):
-    
     if request.method == 'POST':
+        # ... (your existing registration logic)
         user_type = request.POST.get("user_type")
         username = request.POST.get("username")
         email = request.POST.get("email")
@@ -253,25 +241,16 @@ def registration(request):
         contact_no = request.POST.get("contact_no")
         profile_pic = request.FILES.get("profile_pic")
         
-        
         if password == confirm_password:
-            
             user = CustomUser.objects.create_user(
-                username = username,
-                email = email,
-                password = password,
-                user_type= user_type,
-                gender = gender,
-                age = age,
-                contact_no = contact_no,
-                profile_pic = profile_pic,
+                username = username, email = email, password = password,
+                user_type= user_type, gender = gender, age = age,
+                contact_no = contact_no, profile_pic = profile_pic,
             )
-            
             if user_type == 'employee':
                    EmployeeProfile.objects.create(username=user)
             elif user_type == 'admin':
                    AdminProfile.objects.create(username=user)
-                
             return redirect("tasks:loginPage")
     
     return render(request, "registration.html" )
@@ -279,35 +258,30 @@ def registration(request):
 
 def loginPage(request):
     if request.method == 'POST':
+        # ... (your existing login logic)
         user_name = request.POST.get("username")
         pass_word = request.POST.get("password")
         
         try:
             user = authenticate(request, username=user_name, password = pass_word)
-            
             if user is not None:
                 login(request, user)
-                if  user.is_authenticated and (user.user_type == '1' or user.user_type == 'admin'):
+                if user.is_authenticated and (user.user_type == '1' or user.user_type == 'admin'):
                     return redirect("tasks:AdminDashboard")
                 elif user.is_authenticated and (user.user_type == '2' or user.user_type == 'employee'):
                     return redirect("tasks:employeeDashboard")
                 else:
                     return redirect("tasks:home")
             else:
-                # Provide feedback for failed login
                 return render(request, 'loginPage.html', {'error': 'Invalid credentials'})
-        
         except CustomUser.DoesNotExist:
             return redirect("tasks:registration")
-    
     
     return render(request, 'loginPage.html')
 
 
 def logoutPage(request):
-    
     logout(request)
-    
     return redirect("tasks:loginPage")
 
 
@@ -320,7 +294,7 @@ def AdminProfilePage(request):
         elif request.user.user_type == 'employee':
             profile = request.user.employee.first()
     except (AdminProfile.DoesNotExist, EmployeeProfile.DoesNotExist):
-        pass # profile is None
+        pass
         
     return render(request, "admin/AdminProfilePage.html", {'profile': profile})
 
@@ -330,7 +304,6 @@ def edit_profile(request):
     profile = None
     ProfileForm = None
 
-    # Determine user type and get/create profile and form
     if user.is_superuser or ((user.user_type == 'admin') or (user.user_type == '1')):
         profile, _ = AdminProfile.objects.get_or_create(username=user)
         ProfileForm = EditAdminForm
@@ -347,12 +320,10 @@ def edit_profile(request):
         if user_form.is_valid() and profile_form.is_valid():
             user_form.save()
             profile_form.save()
-            # Redirect based on user type
             if user.user_type == 'admin' or user.user_type == '1':
                 return redirect('tasks:AdminProfilePage')
             elif user.user_type == 'employee' or user.user_type == '2':
                 return redirect('tasks:employeeProfilePage')
-
     else:
         user_form = ProfileEditForm(instance=user)
         profile_form = ProfileForm(instance=profile)
@@ -365,8 +336,9 @@ def edit_profile(request):
 def login_required_view(request):
     return render(request, 'login_required_view.html')
 
+
 # .....................................................
-# Admin Dashboard start here
+# DASHBOARD AND PANEL VIEWS
 # ......................................................
 
 def admin_base(request):
@@ -374,6 +346,7 @@ def admin_base(request):
 
 @staff_member_required
 def AdminDashboard(request):
+    # ... (your existing AdminDashboard logic)
     status_list = Task.objects.values_list('status', flat=True)
     status_count = Counter(status_list)
     priority_list = Task.objects.values_list('priority', flat=True)
@@ -392,10 +365,6 @@ def AdminDashboard(request):
 
     return render(request, 'admin/AdminDashboard.html', context)
 
-# .....................................................
-# Employee panel start here
-# ......................................................
-
 @login_required
 def employeeProfilePage(request):
     profile = None
@@ -407,12 +376,8 @@ def employeeProfilePage(request):
 
 @login_required
 def employeeDashboard(request):
-    
+    # ... (your existing employeeDashboard logic)
     user = request.user
-    # if user.user_type != 'employee':
-    #     raise PermissionDenied
-
-    # Query tasks assigned to the current user
     user_tasks = Task.objects.filter(assigned_to=user)
     
     total_tasks = user_tasks.count()
@@ -432,3 +397,44 @@ def employeeDashboard(request):
     }
 
     return render(request, 'employee/employeeDashboard.html', context)
+
+
+# .....................................................
+# NEW VIEWS FOR WORK UPDATES
+# ......................................................
+
+@staff_member_required
+def work_updates(request):
+
+    update_messages = Message.objects.filter(
+        recipient=request.user,
+        subject__startswith='Task Updated:'
+    ).order_by('-id')
+
+    unread_updates = update_messages.filter(is_read=False)
+
+    if unread_updates.exists():
+        unread_updates.update(is_read=True)
+
+    context = {
+        'updates': update_messages
+    }
+    return render(request, 'work_updates.html', context)
+
+@login_required
+def work_update_count(request):
+    """
+    Provides the count of unread work updates for the sidebar badge.
+    """
+    if not request.user.is_staff:
+        return JsonResponse({'update_count': 0})
+    
+    # Counts unread messages that are specifically work updates
+    # This assumes your Message model has an 'is_read' boolean field.
+    count = Message.objects.filter(
+        recipient=request.user,
+        subject__startswith='Task Updated:',
+        is_read=False
+    ).count()
+    
+    return JsonResponse({'update_count': count})
