@@ -1,0 +1,184 @@
+# GitLab CI/CD Pipeline for Django Task Management System
+# This pipeline will test, build, and deploy your Django application
+
+stages:
+  - test
+  - build
+  - deploy
+
+variables:
+  PYTHON_VERSION: "3.12"
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+  DJANGO_SETTINGS_MODULE: "taskmanager.settings"
+
+# Cache pip packages to speed up builds
+cache:
+  paths:
+    - .cache/pip
+    - venv/
+
+# Template for Python setup
+.python_setup: &python_setup
+  image: python:${PYTHON_VERSION}
+  before_script:
+    - python --version
+    - pip install --upgrade pip
+    - pip install virtualenv
+    - virtualenv venv
+    - source venv/bin/activate
+    - cd taskmanager
+    - pip install -r requirements.txt || echo "No requirements.txt found, skipping..."
+
+# ==========================================
+# TEST STAGE
+# ==========================================
+
+# Run Python linting
+lint:
+  stage: test
+  <<: *python_setup
+  script:
+    - pip install flake8
+    - flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+    - flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+  allow_failure: true
+  only:
+    - branches
+    - merge_requests
+
+# Run Django tests
+test:
+  stage: test
+  <<: *python_setup
+  script:
+    - python manage.py check
+    - python manage.py test --noinput
+  coverage: '/TOTAL.*\s+(\d+%)$/'
+  artifacts:
+    reports:
+      junit: report.xml
+    paths:
+      - htmlcov/
+    expire_in: 1 week
+  only:
+    - branches
+    - merge_requests
+
+# Check for security vulnerabilities
+security_check:
+  stage: test
+  <<: *python_setup
+  script:
+    - pip install safety bandit
+    - safety check || echo "Safety check completed with warnings"
+    - bandit -r . -f json -o bandit-report.json || echo "Bandit scan completed"
+  artifacts:
+    paths:
+      - bandit-report.json
+    expire_in: 1 week
+  allow_failure: true
+  only:
+    - branches
+    - merge_requests
+
+# ==========================================
+# BUILD STAGE
+# ==========================================
+
+build:
+  stage: build
+  <<: *python_setup
+  script:
+    - python manage.py collectstatic --noinput
+    - python manage.py check --deploy
+  artifacts:
+    paths:
+      - taskmanager/staticfiles/
+    expire_in: 1 day
+  only:
+    - main
+    - develop
+    - tags
+
+# ==========================================
+# DEPLOYMENT STAGE
+# ==========================================
+
+# Deploy to Staging Environment
+deploy_staging:
+  stage: deploy
+  <<: *python_setup
+  script:
+    - echo "Deploying to staging server..."
+    - echo "Installing dependencies..."
+    # Add your staging server deployment commands here
+    # Example: rsync, scp, or deployment scripts
+    # - apt-get update -qq && apt-get install -y -qq sshpass rsync
+    # - sshpass -p "$STAGING_PASSWORD" rsync -avz --exclude='.git' --exclude='venv' . $STAGING_USER@$STAGING_HOST:$STAGING_PATH
+    # - sshpass -p "$STAGING_PASSWORD" ssh $STAGING_USER@$STAGING_HOST "cd $STAGING_PATH && source venv/bin/activate && pip install -r taskmanager/requirements.txt && python taskmanager/manage.py migrate && python taskmanager/manage.py collectstatic --noinput && sudo systemctl restart gunicorn"
+  environment:
+    name: staging
+    url: https://staging.yourdomain.com
+  only:
+    - develop
+  when: manual
+
+# Deploy to Production Environment
+deploy_production:
+  stage: deploy
+  <<: *python_setup
+  script:
+    - echo "Deploying to production server..."
+    - echo "Running migrations and collecting static files..."
+    # Add your production server deployment commands here
+    # Example using SSH:
+    # - apt-get update -qq && apt-get install -y -qq sshpass rsync
+    # - sshpass -p "$PROD_PASSWORD" rsync -avz --exclude='.git' --exclude='venv' --exclude='*.pyc' --exclude='__pycache__' . $PROD_USER@$PROD_HOST:$PROD_PATH
+    # - sshpass -p "$PROD_PASSWORD" ssh $PROD_USER@$PROD_HOST "cd $PROD_PATH && source venv/bin/activate && pip install -r taskmanager/requirements.txt && python taskmanager/manage.py migrate --noinput && python taskmanager/manage.py collectstatic --noinput && sudo systemctl restart gunicorn && sudo systemctl restart nginx"
+    
+    # Or using Docker:
+    # - docker build -t task-management-system:latest .
+    # - docker push registry.gitlab.com/yourusername/task-management-system:latest
+    # - ssh $PROD_USER@$PROD_HOST "docker pull registry.gitlab.com/yourusername/task-management-system:latest && docker-compose up -d"
+  environment:
+    name: production
+    url: https://yourdomain.com
+  only:
+    - main
+    - tags
+  when: manual
+
+# Deploy using Docker (Alternative)
+deploy_docker:
+  stage: deploy
+  image: docker:latest
+  services:
+    - docker:dind
+  variables:
+    DOCKER_DRIVER: overlay2
+    DOCKER_TLS_CERTDIR: "/certs"
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    - docker build -t $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA .
+    - docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA $CI_REGISTRY_IMAGE:latest
+    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+    - docker push $CI_REGISTRY_IMAGE:latest
+  only:
+    - main
+    - tags
+  when: manual
+
+# ==========================================
+# CLEANUP
+# ==========================================
+
+cleanup:
+  stage: .post
+  script:
+    - echo "Cleaning up old artifacts and cache..."
+    - rm -rf venv/
+    - rm -rf .cache/
+  when: always
+  only:
+    - schedules

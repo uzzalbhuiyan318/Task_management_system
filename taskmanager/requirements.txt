@@ -1,0 +1,42 @@
+# Django Task Management System - Requirements
+# Core Framework
+Django>=4.2,<5.0
+python-decouple>=3.8
+
+# Database
+psycopg2-binary>=2.9.9  # PostgreSQL adapter (for production)
+
+# Web Server
+gunicorn>=21.2.0
+whitenoise>=6.6.0  # Static file serving
+
+# Image Processing
+Pillow>=10.0.0
+
+# Forms and Validation
+django-crispy-forms>=2.1
+crispy-bootstrap5>=2024.2
+
+# Security
+django-cors-headers>=4.3.0
+
+# Development Tools
+django-debug-toolbar>=4.2.0  # Only for development
+
+# Testing
+coverage>=7.3.0
+pytest>=7.4.0
+pytest-django>=4.5.0
+
+# Code Quality
+flake8>=6.1.0
+black>=23.10.0
+isort>=5.12.0
+
+# Security Scanning
+bandit>=1.7.5
+safety>=2.3.5
+
+# Utilities
+python-dateutil>=2.8.2
+pytz>=2023.3
