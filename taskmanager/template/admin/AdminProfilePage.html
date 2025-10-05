@@ -68,7 +68,7 @@
       <div class="profile-card text-center">
 
         {% if user.is_authenticated %}
-          {% if user.user_type == '1' or user.is_staff %}
+          {% if user.user_type == '1' or user.user_type == 'admin' %}
             <h2 class="profile-title admin-title mb-4">Admin Profile</h2>
           {% elif user.user_type == '2' %}
             <h2 class="profile-title employee-title mb-4">Employee Profile</h2>

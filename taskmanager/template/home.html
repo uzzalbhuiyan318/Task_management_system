@@ -1,1 +1,455 @@
-{% include 'base.html' %} {% block body %} {% endblock body %}
+<!-- Home Page Template for Task Management System
+This template renders the main landing page with multiple sections designed to introduce and promote the platform.
+Sections include: Hero, Key Features, How It Works, Benefits, Testimonials, and Pre-footer CTA.
+The page uses Django template inheritance, Bootstrap for styling, and FontAwesome for icons.
+All sections are responsive and follow a consistent design pattern for optimal user experience.
+-->
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Home - Task Management System{% endblock title %}
+
+{% block body %}
+  <!--
+  Hero Section: This section serves as the main introduction to the Task Management System.
+  It features a prominent headline, descriptive text about the platform's benefits, and a hero image.
+  The purpose is to immediately engage visitors and communicate the core value proposition of transforming workflows through smart task management.
+  -->
+  <!--  Hero Section -->
+  <section class="header hero-section py-5">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-lg-6">
+          <h1 class="display-4 fw-bold">Transform Your Workflow with Smart Task Management</h1>
+          <p class="lead mb-4">Streamline your projects, boost team productivity, and achieve your goals with our comprehensive task management platform. Built for teams that demand excellence.</p>
+          <!-- <div class="hero-buttons">
+            <a href="{% url 'tasks:registration' %}" class="btn btn-primary btn-lg me-3">Start Free Trial</a>
+            <a href="{% url 'tasks:aboutUs' %}" class="btn btn-outline-primary btn-lg">Learn More</a>
+          </div> -->
+          <!-- Hero Stats -->
+          <!-- <div class="row mt-5">
+            <div class="col-4 text-center">
+              <h3 class="text-primary fw-bold">100+</h3>
+              <p class="small text-muted">Projects Managed</p>
+            </div>
+            <div class="col-4 text-center">
+              <h3 class="text-success fw-bold">24/7</h3>
+              <p class="small text-muted">Support Available</p>
+            </div>
+            <div class="col-4 text-center">
+              <h3 class="text-warning fw-bold">99%</h3>
+              <p class="small text-muted">Uptime Guarantee</p>
+            </div>
+          </div> -->
+        </div>
+        <div class="col-lg-6">
+          <img src="{% static 'images/hero-image.jpg' %}" alt="Task Management Dashboard" class="img-fluid hero-image rounded shadow">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!--
+  Key Features Section: Showcases the core functionalities of the task management system.
+  Displays six main features in a grid layout with icons, titles, and descriptions.
+  Features include task management, role-based access, work updates, analytics, messaging, and file management.
+  Uses Bootstrap cards for consistent styling and FontAwesome icons for visual appeal.
+  -->
+  <!-- Key Features Section -->
+  <section class="features-section py-5 bg-light">
+    <div class="container">
+      <div class="text-center mb-5">
+        <h2 class="display-5 fw-bold">Core Features of Our Task Management System</h2>
+        <p class="lead text-muted">Designed for efficient employee collaboration and Task tracking</p>
+      </div>
+      <div class="row">
+        <div class="col-lg-4 col-md-6 mb-4">
+          <div class="card h-100 border-0 shadow-sm text-center p-4">
+            <div class="card-body">
+              <i class="fa-solid fa-tasks text-primary fs-1 mb-3"></i>
+              <h5 class="card-title">Task Assignment & Management</h5>
+              <p class="card-text text-muted">Admins can create, assign, and manage tasks with priority levels, due dates, and file attachments. Complete CRUD operations with validation.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-4 col-md-6 mb-4">
+          <div class="card h-100 border-0 shadow-sm text-center p-4">
+            <div class="card-body">
+              <i class="fa-solid fa-user-check text-success fs-1 mb-3"></i>
+              <h5 class="card-title">Role-Based Access Control</h5>
+              <p class="card-text text-muted">Secure authentication with distinct admin and employee roles. Each user type has specific permissions and dashboard views.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-4 col-md-6 mb-4">
+          <div class="card h-100 border-0 shadow-sm text-center p-4">
+            <div class="card-body">
+              <i class="fa-solid fa-clipboard-check text-warning fs-1 mb-3"></i>
+              <h5 class="card-title">Work Update Approval System</h5>
+              <p class="card-text text-muted">Employees submit work updates for admin review. Built-in approval workflow with feedback, comments, and status tracking.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-4 col-md-6 mb-4">
+          <div class="card h-100 border-0 shadow-sm text-center p-4">
+            <div class="card-body">
+              <i class="fa-solid fa-chart-pie text-info fs-1 mb-3"></i>
+              <h5 class="card-title">Dashboard Analytics</h5>
+              <p class="card-text text-muted">Real-time dashboards showing task statistics, priority distribution, completion rates, and performance metrics for both admins and employees.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-4 col-md-6 mb-4">
+          <div class="card h-100 border-0 shadow-sm text-center p-4">
+            <div class="card-body">
+              <i class="fa-solid fa-comments text-purple fs-1 mb-3"></i>
+              <h5 class="card-title">Internal Messaging System</h5>
+              <p class="card-text text-muted">Built-in messaging functionality for admin-employee communication with read/unread status and conversation threads.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-4 col-md-6 mb-4">
+          <div class="card h-100 border-0 shadow-sm text-center p-4">
+            <div class="card-body">
+               <i class="fa-solid fa-file-upload text-danger fs-1 mb-3"></i>
+              <h5 class="card-title">File Management & Uploads</h5>
+              <p class="card-text text-muted">Upload and manage task-related documents, images, and files. Profile picture management with secure file handling.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!--
+  How It Works Section: Explains the user onboarding process in three simple steps.
+  Step 1: Account creation and role selection.
+  Step 2: Task creation and assignment.
+  Step 3: Progress tracking and collaboration.
+  Uses numbered circles and step-by-step layout to guide users through the platform's workflow.
+  -->
+  <!-- How It Works Section -->
+  <section class="how-it-works-section py-5">
+    <div class="container">
+      <div class="text-center mb-5">
+        <h2 class="display-5 fw-bold">How It Works</h2>
+        <p class="lead text-muted">Get started in three simple steps</p>
+      </div>
+      <div class="row">
+        <div class="col-lg-4 text-center mb-4">
+          <div class="step-circle bg-primary text-white mb-3 mx-auto d-flex align-items-center justify-content-center" style="width: 80px; height: 80px; border-radius: 50%;">
+            <span class="fs-2 fw-bold">1</span>
+          </div>
+          <h4>Create Your Account</h4>
+          <p class="text-muted">Sign up for free and set up your workspace in minutes. Choose your role as admin or team member.</p>
+        </div>
+        <div class="col-lg-4 text-center mb-4">
+          <div class="step-circle bg-success text-white mb-3 mx-auto d-flex align-items-center justify-content-center" style="width: 80px; height: 80px; border-radius: 50%;">
+            <span class="fs-2 fw-bold">2</span>
+          </div>
+          <h4>Create & Assign Tasks</h4>
+          <p class="text-muted">Create tasks, set priorities, assign to team members, and attach files. Everything you need in one place.</p>
+        </div>
+        <div class="col-lg-4 text-center mb-4">
+          <div class="step-circle bg-warning text-white mb-3 mx-auto d-flex align-items-center justify-content-center" style="width: 80px; height: 80px; border-radius: 50%;">
+            <span class="fs-2 fw-bold">3</span>
+          </div>
+          <h4>Track & Collaborate</h4>
+          <p class="text-muted">Monitor progress, receive updates, and collaborate with your team through integrated messaging.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!--
+  Benefits Section: Highlights the key advantages of using the task management system.
+  Features four main benefits: centralized task management, real-time updates, priority organization, and file management.
+  Uses a two-column layout with checkmark icons and descriptive text on the left, and an illustrative image on the right.
+  Emphasizes productivity improvements and workflow organization.
+  -->
+  <!-- Benefits Section -->
+  <section class="benefits-section py-5 bg-light">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-lg-6">
+          <h2 class="display-5 fw-bold mb-4">Boost Your Team's Productivity</h2>
+          <p class="lead text-muted mb-4">Experience the power of organized workflow management with features designed for modern teams.</p>
+          
+          <div class="benefit-item d-flex align-items-start mb-4">
+            <i class="fa-solid fa-check-circle text-success fs-4 me-3 mt-1"></i>
+            <div>
+              <h5 class="mb-2">Centralized Task Management</h5>
+              <p class="text-muted">Keep all your tasks, projects, and deadlines in one organized dashboard. Never lose track of important work again.</p>
+            </div>
+          </div>
+          
+          <div class="benefit-item d-flex align-items-start mb-4">
+            <i class="fa-solid fa-check-circle text-success fs-4 me-3 mt-1"></i>
+            <div>
+              <h5 class="mb-2">Real-time Status Updates</h5>
+              <p class="text-muted">Get instant notifications when tasks are updated, completed, or require attention. Stay in the loop always.</p>
+            </div>
+          </div>
+          
+          <div class="benefit-item d-flex align-items-start mb-4">
+            <i class="fa-solid fa-check-circle text-success fs-4 me-3 mt-1"></i>
+            <div>
+              <h5 class="mb-2">Priority-based Organization</h5>
+              <p class="text-muted">Organize tasks by priority levels and ensure critical work gets the attention it deserves.</p>
+            </div>
+          </div>
+          
+          <div class="benefit-item d-flex align-items-start">
+            <i class="fa-solid fa-check-circle text-success fs-4 me-3 mt-1"></i>
+            <div>
+              <h5 class="mb-2">File Management</h5>
+              <p class="text-muted">Attach documents, images, and files directly to tasks for easy access and organization.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <img src="{% static 'images/home-body.jpg' %}" class="img-fluid rounded shadow" alt="Team Productivity">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!--
+  Testimonials Section: Builds trust and credibility through user feedback.
+  Features three customer testimonials with 5-star ratings, quotes, names, and company affiliations.
+  Uses card-based layout with star icons to visually represent positive reviews.
+  Helps potential users understand real-world benefits and satisfaction levels.
+  -->
+  <!-- Testimonials Section -->
+  <!-- <section class="testimonials-section py-5 bg-light">
+    <div class="container">
+      <div class="text-center mb-5">
+        <h2 class="display-5 fw-bold">What Our Users Say</h2>
+        <p class="lead text-muted">Hear from teams who have transformed their workflow with our platform</p>
+      </div>
+      <div class="row">
+        <div class="col-lg-4 mb-4">
+          <div class="card h-100 border-0 shadow-sm text-center p-4">
+            <div class="card-body">
+              <div class="mb-3">
+                <i class="fa-solid fa-star text-warning"></i>
+                <i class="fa-solid fa-star text-warning"></i>
+                <i class="fa-solid fa-star text-warning"></i>
+                <i class="fa-solid fa-star text-warning"></i>
+                <i class="fa-solid fa-star text-warning"></i>
+              </div>
+              <p class="card-text text-muted mb-3">"This task management system has revolutionized how our team collaborates. The real-time updates and intuitive interface make project management effortless."</p>
+              <h6 class="fw-bold">Sarah Johnson</h6>
+              <small class="text-muted">Project Manager, TechCorp</small>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-4 mb-4">
+          <div class="card h-100 border-0 shadow-sm text-center p-4">
+            <div class="card-body">
+              <div class="mb-3">
+                <i class="fa-solid fa-star text-warning"></i>
+                <i class="fa-solid fa-star text-warning"></i>
+                <i class="fa-solid fa-star text-warning"></i>
+                <i class="fa-solid fa-star text-warning"></i>
+                <i class="fa-solid fa-star text-warning"></i>
+              </div>
+              <p class="card-text text-muted mb-3">"The role-based access control and approval system ensure smooth workflow. Our productivity has increased by 40% since implementing this platform."</p>
+              <h6 class="fw-bold">Michael Chen</h6>
+              <small class="text-muted">Team Lead, Innovate Solutions</small>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-4 mb-4">
+          <div class="card h-100 border-0 shadow-sm text-center p-4">
+            <div class="card-body">
+              <div class="mb-3">
+                <i class="fa-solid fa-star text-warning"></i>
+                <i class="fa-solid fa-star text-warning"></i>
+                <i class="fa-solid fa-star text-warning"></i>
+                <i class="fa-solid fa-star text-warning"></i>
+                <i class="fa-solid fa-star text-warning"></i>
+              </div>
+              <p class="card-text text-muted mb-3">"Excellent file management and messaging features. It's everything we need in one place. Highly recommend for any growing team."</p>
+              <h6 class="fw-bold">Emily Rodriguez</h6>
+              <small class="text-muted">Operations Manager, Growth Inc.</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section> -->
+
+  <!-- Statistics Section -->
+  <!-- <section class="stats-section py-5">
+    <div class="container">
+      <div class="text-center mb-5">
+        <h2 class="display-5 fw-bold">Trusted by Teams Worldwide</h2>
+        <p class="lead text-muted">See how our platform is making a difference</p>
+      </div>
+      <div class="row text-center">
+        <div class="col-lg-3 col-md-6 mb-4">
+          <div class="stat-item">
+            <i class="fa-solid fa-tasks text-primary fs-1 mb-3"></i>
+            <h3 class="fw-bold text-primary">10,000+</h3>
+            <p class="text-muted">Tasks Completed</p>
+          </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-4">
+          <div class="stat-item">
+            <i class="fa-solid fa-users text-success fs-1 mb-3"></i>
+            <h3 class="fw-bold text-success">500+</h3>
+            <p class="text-muted">Active Users</p>
+          </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-4">
+          <div class="stat-item">
+            <i class="fa-solid fa-building text-warning fs-1 mb-3"></i>
+            <h3 class="fw-bold text-warning">50+</h3>
+            <p class="text-muted">Organizations</p>
+          </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-4">
+          <div class="stat-item">
+            <i class="fa-solid fa-star text-info fs-1 mb-3"></i>
+            <h3 class="fw-bold text-info">4.9/5</h3>
+            <p class="text-muted">User Rating</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section> -->
+
+  <!-- Technology Stack Section -->
+  <!-- <section class="tech-section py-5 bg-dark text-white">
+    <div class="container">
+      <div class="text-center mb-5">
+        <h2 class="display-5 fw-bold">Built with Modern Technology</h2>
+        <p class="lead text-muted">Powered by industry-leading technologies for optimal performance</p>
+      </div>
+      <div class="row text-center">
+        <div class="col-lg-2 col-md-4 col-6 mb-4">
+          <div class="tech-item">
+            <i class="fa-brands fa-python fs-1 text-primary mb-2"></i>
+            <p>Django</p>
+          </div>
+        </div>
+        <div class="col-lg-2 col-md-4 col-6 mb-4">
+          <div class="tech-item">
+            <i class="fa-brands fa-bootstrap fs-1 text-success mb-2"></i>
+            <p>Bootstrap</p>
+          </div>
+        </div>
+        <div class="col-lg-2 col-md-4 col-6 mb-4">
+          <div class="tech-item">
+            <i class="fa-brands fa-js-square fs-1 text-warning mb-2"></i>
+            <p>JavaScript</p>
+          </div>
+        </div>
+        <div class="col-lg-2 col-md-4 col-6 mb-4">
+          <div class="tech-item">
+            <i class="fa-solid fa-database fs-1 text-info mb-2"></i>
+            <p>SQLite</p>
+          </div>
+        </div>
+        <div class="col-lg-2 col-md-4 col-6 mb-4">
+          <div class="tech-item">
+            <i class="fa-brands fa-html5 fs-1 text-danger mb-2"></i>
+            <p>HTML5</p>
+          </div>
+        </div>
+        <div class="col-lg-2 col-md-4 col-6 mb-4">
+          <div class="tech-item">
+            <i class="fa-brands fa-css3-alt fs-1 text-primary mb-2"></i>
+            <p>CSS3</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section> -->
+
+  
+
+  <!-- FAQ Section -->
+  <!-- <section class="faq-section py-5 bg-light">
+    <div class="container">
+      <div class="text-center mb-5">
+        <h2 class="display-5 fw-bold">Frequently Asked Questions</h2>
+        <p class="lead text-muted">Find answers to common questions about our platform</p>
+      </div>
+      <div class="row justify-content-center">
+        <div class="col-lg-8">
+          <div class="accordion" id="faqAccordion">
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="headingOne">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne">
+                  How do I get started with the task management system?
+                </button>
+              </h2>
+              <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                <div class="accordion-body">
+                  Getting started is easy! Simply register for a free account, choose your role (admin or employee), and start creating tasks. Our intuitive interface makes it simple to begin managing your projects immediately.
+                </div>
+              </div>
+            </div>
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="headingTwo">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo">
+                  Can I collaborate with my team members?
+                </button>
+              </h2>
+              <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                <div class="accordion-body">
+                  Absolutely! Our platform is designed for team collaboration. You can assign tasks to team members, track progress in real-time, receive notifications, and communicate through our built-in messaging system.
+                </div>
+              </div>
+            </div>
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="headingThree">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree">
+                  Is my data secure on this platform?
+                </button>
+              </h2>
+              <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                <div class="accordion-body">
+                  Yes, we take security seriously. Our platform uses enterprise-grade security measures, including role-based access control, secure authentication, and data encryption to protect your information.
+                </div>
+              </div>
+            </div>
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="headingFour">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour">
+                  Can I access the platform on mobile devices?
+                </button>
+              </h2>
+              <div id="collapseFour" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                <div class="accordion-body">
+                  Yes! Our platform is fully responsive and works seamlessly on all devices - desktop, tablet, and mobile. You can manage your tasks and collaborate with your team from anywhere.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section> -->
+
+  <!--
+  Pre-footer Call-to-Action Section: Final conversion section before the footer.
+  Encourages users to take action with compelling copy about joining other successful teams.
+  Uses white text on dark background for contrast and includes commented-out action buttons.
+  Serves as the last opportunity to convert visitors into users before they leave the page.
+  -->
+  <!-- pre-footer call-to-action section -->
+  <section class="pre-footer py-5">
+    <div class="container text-center text-white">
+      <h2 class="pre-footer-title mb-3">Ready to Transform Your Workflow?</h2>
+      <p class="pre-footer-sub mb-4">Join thousands of teams that trust our platform for their task management needs. Start your journey today!</p>
+      <!-- <div class="pre-footer-actions">
+        <a href="{% url 'tasks:registration' %}" class="btn btn-primary btn-lg me-3">Start Free Trial</a>
+        <a href="{% url 'tasks:contactPage' %}" class="btn btn-outline-light btn-lg">Contact Us</a>
+      </div> -->
+    </div>
+  </section>
+
+  {% include 'footer.html' %}
+{% endblock body %}

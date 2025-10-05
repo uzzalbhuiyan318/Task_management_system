@@ -1,131 +1,218 @@
 {% extends 'admin/admin_base.html' %}
 {% load static %}
 
-{% block title %}Employee Dashboard{% endblock %}
+{% block title %}Employee Panel · Dashboard{% endblock %}
 
 {% block content %}
 <style>
-  body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  :root{
+    /* Clean light theme tokens */
+    --bg: #ffffff;
+    --surface: #f8fafc;
+    --card: #ffffff;
+    --border: #e2e8f0;
+    --text: #0f172a;
+    --muted: #64748b;
+
+    --brand: #2563eb;
+    --ok: #16a34a;
+    --warn: #d97706;
+    --info: #0891b2;
+    --danger: #dc2626;
+
+    --radius: 12px;
+    --shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+    --shadow-hover: 0 8px 20px rgba(15, 23, 42, 0.12);
+
+    --space-2: 1rem;
+    --space-3: 1.25rem;
+    --space-4: 2rem;
   }
 
-  .dashboard-header {
-    font-size: 2.5rem;
-    font-weight: 700;
-    text-align: center;
-    margin-bottom: 0.2rem;
+  /* Base styling */
+  body{ font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif; color: var(--text); background: var(--bg); }
+  .container{ max-width: 1160px; }
+
+  /* Header */
+  .dashboard-header{ font-size: clamp(1.75rem, 1.4rem + 1vw, 2.25rem); font-weight: 800; margin: 0 0 .3rem; letter-spacing: -.01em; }
+  .dashboard-subheader{ color: var(--muted); margin: 0 0 2rem; font-size: 1.05rem; }
+
+  /* Grid system */
+  .kpi-grid{
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
   }
 
-  .dashboard-subheader {
-    font-size: 1rem;
-    color: #6c757d;
-    text-align: center;
-    margin-bottom: 2.5rem;
+  /* KPI Cards - Perfect vertical alignment */
+  .kpi{
+    grid-column: span 3;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: var(--space-3);
+    box-shadow: var(--shadow);
+    transition: transform .2s ease, box-shadow .2s ease;
+    position: relative;
+    min-height: 140px; /* Fixed height for perfect alignment */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Changed from flex-start to space-between */
   }
+  .kpi:hover{ transform: translateY(-2px); box-shadow: var(--shadow-hover); }
 
-  .section-title {
+  .kpi .label{ 
+    color: var(--muted); 
+    font-size: .95rem; 
+    font-weight: 500; 
+    margin: 0; /* Removed margin for precise control */
+    line-height: 1.2;
+    flex-shrink: 0;
+    order: 1; /* Explicit order */
+  }
+  .kpi .value{ 
+    font-size: clamp(2rem, 1.6rem + 1vw, 2.5rem); 
+    font-weight: 800; 
+    margin: 0; 
+    letter-spacing: -.02em;
+    line-height: 1.1; /* Slightly increased for better spacing */
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    order: 2; /* Explicit order */
+  }
+  .kpi .chip{
+    border-radius: 6px; 
+    font-size: .75rem; 
     font-weight: 600;
-    font-size: 1.2rem;
-    margin-bottom: 1rem;
-    color: #333;
+    padding: .3rem .6rem; 
+    background: var(--surface); 
+    color: var(--muted); 
+    border: 1px solid var(--border);
+    margin: 0; /* Removed margin for precise control */
+    align-self: flex-start; /* Changed from flex-end to flex-start */
+    flex-shrink: 0;
+    order: 3; /* Explicit order */
   }
 
-  .card-modern {
-    border-radius: 20px;
-    padding: 2rem;
-    text-align: center;
-    color: #fff;
-    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    font-weight: 600;
+  /* Intent colors via top border */
+  .kpi.total{ border-top: 3px solid var(--brand); }
+  .kpi.pending{ border-top: 3px solid var(--warn); }
+  .kpi.progress{ border-top: 3px solid var(--info); }
+  .kpi.done{ border-top: 3px solid var(--ok); }
+
+  /* Section heading */
+  .section-title{ font-weight: 800; font-size: 1.15rem; color: var(--text); margin: 0 0 1rem; }
+
+  /* Priority cards */
+  .priority{
+    grid-column: span 4;
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between; 
+    gap: var(--space-2);
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: var(--space-3);
+    box-shadow: var(--shadow);
+    transition: transform .2s ease, box-shadow .2s ease;
+    min-height: 80px;
+  }
+  .priority:hover{ transform: translateY(-1px); box-shadow: var(--shadow-hover); }
+
+  .priority .meta{ display: flex; align-items: center; gap: .7rem; flex-grow: 1; }
+  .badge-dot{ width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .dot-high{ background: var(--danger); }
+  .dot-medium{ background: var(--warn); }
+  .dot-low{ background: var(--ok); }
+  .priority .name{ color: var(--muted); font-weight: 600; }
+  .priority .count{ 
+    font-size: 1.6rem; 
+    font-weight: 800; 
+    flex-shrink: 0;
+    line-height: 1.1;
+    min-width: 40px;
+    text-align: right;
   }
 
-  .card-modern:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+  /* Responsive breakpoints - Perfect alignment maintained */
+  @media (max-width: 1199px){ 
+    .kpi{ grid-column: span 4; min-height: 120px; } /* Consistent height */
+    .kpi .value{ font-size: clamp(1.6rem, 1.2rem + 1vw, 2rem); }
   }
-
-  .card-blue { background-color: #007bff; }
-  .card-yellow { background-color: #ffc107; color: #000; }
-  .card-cyan { background-color: #17c0eb; color: #000; }
-  .card-green { background-color: #28a745; }
-  .card-red { background-color: #dc3545; }
-  .card-gray { background-color: #6c757d; }
-  .card-light { background-color: #f8f9fa; color: #212529; }
-
-  .card-value {
-    font-size: 2.2rem;
-    margin-bottom: 0.5rem;
+  @media (max-width: 767px){
+    .kpi{ grid-column: span 6; min-height: 110px; } /* Consistent height */
+    .priority{ grid-column: span 12; }
+    .dashboard-header{ font-size: 1.75rem; }
+    .kpi .value{ font-size: clamp(1.4rem, 1rem + 1vw, 1.8rem); }
   }
-
-  .card-label {
-    font-size: 1rem;
-    opacity: 0.9;
-  }
-
-  .dashboard-section {
-    margin-bottom: 3rem;
+  @media (max-width: 480px){
+    .kpi{ grid-column: span 12; min-height: 100px; } /* Consistent height */
+    .kpi .value{ font-size: 1.5rem; }
   }
 </style>
 
 <div class="container py-5">
-  <h1 class="dashboard-header">Employee Dashboard</h1>
-  <p class="dashboard-subheader">Overview of task statuses and priorities</p>
+  <header>
+    <h1 class="dashboard-header">Employee Dashboard</h1>
+    <p class="dashboard-subheader">Key tasks and priorities at a glance</p>
+  </header>
 
-  <!-- Task Status -->
-  <div class="dashboard-section">
-    <h5 class="section-title">📊 Task Status Overview</h5>
-    <div class="row g-4">
-      <div class="col-md-3">
-        <div class="card-modern card-blue">
-          <div class="card-value">{{ total_tasks }}</div>
-          <div class="card-label">Total Assigned Tasks</div>
-        </div>
-      </div>
-      <div class="col-md-3">
-        <div class="card-modern card-yellow">
-          <div class="card-value">{{ pending }}</div>
-          <div class="card-label">Pending Tasks</div>
-        </div>
-      </div>
-      <div class="col-md-3">
-        <div class="card-modern card-cyan">
-          <div class="card-value">{{ inprogress }}</div>
-          <div class="card-label">In Progress</div>
-        </div>
-      </div>
-      <div class="col-md-3">
-        <div class="card-modern card-green">
-          <div class="card-value">{{ completed }}</div>
-          <div class="card-label">Completed Tasks</div>
-        </div>
-      </div>
-    </div>
-  </div>
+  <!-- KPI Cards -->
+  <section class="kpi-grid" aria-label="Task status overview">
+    <article class="kpi total" role="group" aria-label="Total tasks">
+      <div class="label">Total Assigned</div>
+      <div class="value">{{ total_tasks }}</div>
+      <span class="chip">All</span>
+    </article>
 
-  <!-- Task Priority -->
-  <div class="dashboard-section">
-    <h5 class="section-title">🚦 Task Priority Overview</h5>
-    <div class="row g-4">
-      <div class="col-md-4">
-        <div class="card-modern card-red">
-          <div class="card-value">{{ high }}</div>
-          <div class="card-label">High Priority</div>
-        </div>
+    <article class="kpi pending" role="group" aria-label="Pending tasks">
+      <div class="label">Pending</div>
+      <div class="value">{{ pending }}</div>
+      <span class="chip">Action</span>
+    </article>
+
+    <article class="kpi progress" role="group" aria-label="In progress tasks">
+      <div class="label">In Progress</div>
+      <div class="value">{{ inprogress }}</div>
+      <span class="chip">Ongoing</span>
+    </article>
+
+    <article class="kpi done" role="group" aria-label="Completed tasks">
+      <div class="label">Completed</div>
+      <div class="value">{{ completed }}</div>
+      <span class="chip">Done</span>
+    </article>
+  </section>
+
+  <!-- Task Priorities -->
+  <h2 class="section-title">Task Priority</h2>
+  <section class="kpi-grid" aria-label="Task priority breakdown">
+    <div class="priority">
+      <div class="meta">
+        <span class="badge-dot dot-high" aria-hidden="true"></span>
+        <span class="name">High Priority</span>
       </div>
-      <div class="col-md-4">
-        <div class="card-modern card-gray">
-          <div class="card-value">{{ medium }}</div>
-          <div class="card-label">Medium Priority</div>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="card-modern card-light">
-          <div class="card-value">{{ low }}</div>
-          <div class="card-label">Low Priority</div>
-        </div>
-      </div>
+      <div class="count">{{ high }}</div>
     </div>
-  </div>
+
+    <div class="priority">
+      <div class="meta">
+        <span class="badge-dot dot-medium" aria-hidden="true"></span>
+        <span class="name">Medium Priority</span>
+      </div>
+      <div class="count">{{ medium }}</div>
+    </div>
+
+    <div class="priority">
+      <div class="meta">
+        <span class="badge-dot dot-low" aria-hidden="true"></span>
+        <span class="name">Low Priority</span>
+      </div>
+      <div class="count">{{ low }}</div>
+    </div>
+  </section>
 </div>
 {% endblock %}

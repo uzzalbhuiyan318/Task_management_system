@@ -1,24 +1,29 @@
+{% load static %}
 <div class="topnav">
-  {% if user.is_authenticated %} {% if user.user_type == '1' or user.is_staff or user.user_type == 'admin' %}
-  {% comment %} <a href="{% url 'tasks:AdminDashboard' %}">Dashboard</a>
-  <a href="{% url 'tasks:task_list' %}">Task List</a>
-  {% endcomment %}
-  {% comment %} <a href="{% url 'tasks:AdminProfilePage' %}">Profile</a> {% endcomment %}
-  {% comment %}
-  <a href="{% url 'tasks:logoutPage' %}" class="split">Logout</a> {% endcomment %}
-
-
-
-  {% elif user.user_type == '2' %}
-  <a href="{% url 'tasks:home' %}">Home</a>
-  <a href="{% url 'tasks:task_list' %}">Task List</a>
-  <a href="{% url 'tasks:AdminProfilePage' %}">Profile</a>
-  <a href="{% url 'tasks:logoutPage' %}" class="split">Logout</a>
-  {% endif %} {% else %}
-  <a href="{% url 'tasks:home' %}">Home</a>
-  <a href="{% url 'tasks:task_list' %}">Task List</a>
-  <a href="{% url 'tasks:AdminProfilePage' %}">Profile</a>
-  <a href="{% url 'tasks:loginPage' %}" class="split">Login</a>
-  <a href="{% url 'tasks:registration' %}" class="split">Register</a>
+  {% if user.is_authenticated %}
+    {% if user.user_type == '1' or user.user_type == 'admin' %}
+      {# Admin links (kept commented) #}
+      {% comment %} <a href="{% url 'tasks:AdminDashboard' %}">Dashboard</a>
+      <a href="{% url 'tasks:task_list' %}">Task List</a>
+      {% endcomment %}
+      {% comment %} <a href="{% url 'tasks:AdminProfilePage' %}">Profile</a> {% endcomment %}
+      {% comment %}
+      <a href="{% url 'tasks:logoutPage' %}" class="split">Logout</a> {% endcomment %}
+    {% elif user.user_type == '2' %}
+      <a href="{% url 'tasks:home' %}" class="brand"><img src="{% static 'images/logo.png' %}" class="logo" alt="logo"></a>
+  <div class="nav-links right">{# change to left|center|right to re-align links #}
+        <a href="{% url 'tasks:task_list' %}">Task List</a>
+        <a href="{% url 'tasks:AdminProfilePage' %}">Profile</a>
+        <a href="{% url 'tasks:logoutPage' %}" class="split">Logout</a>
+      </div>
+    {% endif %}
+  {% else %}
+    <a href="{% url 'tasks:home' %}" class="brand"><img src="{% static 'images/logo.png' %}" class="logo"  alt="logo"></a>
+  <div class="nav-links right">{# change to left|center|right to re-align links #}
+      <a href="{% url 'tasks:aboutUs' %}" class="split">About</a>
+      <a href="{% url 'tasks:contactPage' %}" class="split">Contact</a>
+      <a href="{% url 'tasks:registration' %}" class="split">Register</a>
+      <a href="{% url 'tasks:loginPage' %}" class="split">Login</a>
+    </div>
   {% endif %}
 </div>

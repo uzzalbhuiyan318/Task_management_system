@@ -1,0 +1,32 @@
+{% load static %}
+
+  <section class="footer">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-4 d-flex footer-left">
+          <div >
+            <a href="{% url 'tasks:home' %}"><img src="{% static 'images/logo.png' %}" class="img-fluid footer-logo" alt="Logo"></a>
+          </div>
+          <div>
+              <p>PrismERP is one the best ERP solutions Now added Task Manager.</p>
+          </div>
+        </div>
+        <div class="col-lg-4 footer-middle">
+          <h4>Quick Links</h4>
+              <ul>
+                <li><a href="{% url 'tasks:home' %}">Home</a></li>
+                <li><a href="{% url 'tasks:aboutUs' %}">About</a></li>
+                <li><a href="{% url 'tasks:contactPage' %}">Contact</a></li>
+              </ul>
+        </div>
+        <div class="col-lg-4 footer-right">
+          <h4>Social Links</h4>
+              <ul>
+                <li><a href="#" target="_blank"><i class="fa-brands fa-facebook"></i></a></li>
+                <li><a href="#" target="_blank"><i class="fa-brands fa-linkedin"></i></a></li>
+                <li><a href="#" target="_blank"><i class="fa-brands fa-instagram"></i></a></li>
+              </ul>
+        </div>
+      </div>
+    </div>
+  </section>

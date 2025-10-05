@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}About Us{% endblock title %}
+
+{% block body %}
+    <div class="container about-container my-5">
+        <!-- Hero Section -->
+        <section class="about-hero text-center py-5">
+            <h1 class="display-4 mb-4">About Our Task Management System</h1>
+            <p class="lead text-muted">Empowering teams to achieve more through efficient task management and collaboration</p>
+        </section>
+
+        <!-- Mission Section -->
+        <section class="mission-section py-5">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <h2 class="mb-4">Our Mission</h2>
+                    <p class="text-muted">We believe that effective task management is the cornerstone of successful projects. Our mission is to provide organizations with a powerful, intuitive platform that streamlines workflow management, enhances team collaboration, and drives productivity.</p>
+                    <p class="text-muted">Built with Django and modern web technologies, our system offers a comprehensive solution for managing tasks, tracking progress, and facilitating communication between team members and administrators.</p>
+                </div>
+                <div class="col-lg-6">
+                    <img src="{% static 'images/hero-image.jpg' %}" class="img-fluid rounded shadow" alt="Mission Image">
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="features-section py-5">
+            <h2 class="text-center mb-5">What We Offer</h2>
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 border-primary">
+                        <div class="card-body text-center">
+                            <i class="fa-solid fa-tasks text-primary fs-1 mb-3"></i>
+                            <h5 class="card-title">Task Management</h5>
+                            <p class="card-text">Create, assign, and track tasks with detailed descriptions, priorities, and due dates. Monitor progress from start to completion.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 border-success">
+                        <div class="card-body text-center">
+                            <i class="fa-solid fa-users text-success fs-1 mb-3"></i>
+                            <h5 class="card-title">Team Collaboration</h5>
+                            <p class="card-text">Enable seamless communication between administrators and employees with built-in messaging and work update notifications.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 border-warning">
+                        <div class="card-body text-center">
+                            <i class="fa-solid fa-chart-line text-warning fs-1 mb-3"></i>
+                            <h5 class="card-title">Progress Tracking</h5>
+                            <p class="card-text">Real-time dashboards provide insights into task status, priority distribution, and team performance metrics.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Technology Section -->
+        <!-- <section class="technology-section py-5 bg-light rounded">
+            <div class="container">
+                <h2 class="text-center mb-5">Built with Modern Technology</h2>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <h4 class="mb-3">Backend Technologies</h4>
+                        <ul class="list-unstyled">
+                            <li class="mb-2"><i class="fa-brands fa-python text-primary me-2"></i><strong>Django Framework</strong> - Robust and scalable web framework</li>
+                            <li class="mb-2"><i class="fa-solid fa-database text-info me-2"></i><strong>SQLite Database</strong> - Reliable data storage and management</li>
+                            <li class="mb-2"><i class="fa-solid fa-envelope text-warning me-2"></i><strong>Email Integration</strong> - Automated notifications and updates</li>
+                            <li class="mb-2"><i class="fa-solid fa-shield-alt text-success me-2"></i><strong>User Authentication</strong> - Secure login and role-based access</li>
+                        </ul>
+                    </div>
+                    <div class="col-lg-6">
+                        <h4 class="mb-3">Frontend Technologies</h4>
+                        <ul class="list-unstyled">
+                            <li class="mb-2"><i class="fa-brands fa-bootstrap text-primary me-2"></i><strong>Bootstrap 5</strong> - Responsive and modern UI design</li>
+                            <li class="mb-2"><i class="fa-brands fa-js-square text-warning me-2"></i><strong>JavaScript & AJAX</strong> - Dynamic and interactive user experience</li>
+                            <li class="mb-2"><i class="fa-solid fa-mobile-alt text-success me-2"></i><strong>Responsive Design</strong> - Optimized for all devices</li>
+                            <li class="mb-2"><i class="fa-solid fa-palette text-info me-2"></i><strong>Modern Icons</strong> - Font Awesome and Bootstrap Icons</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section> -->
+
+        <!-- Key Features Section -->
+        <section class="key-features-section py-5">
+            <h2 class="text-center mb-5">Key Features</h2>
+            <div class="row">
+                <div class="col-lg-6 mb-4">
+                    <div class="d-flex align-items-start">
+                        <i class="fa-solid fa-user-shield text-primary fs-3 me-3"></i>
+                        <div>
+                            <h5>Role-Based Access Control</h5>
+                            <p class="text-muted">Separate interfaces for administrators and employees with appropriate permissions and functionalities.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 mb-4">
+                    <div class="d-flex align-items-start">
+                        <i class="fa-solid fa-bell text-warning fs-3 me-3"></i>
+                        <div>
+                            <h5>Real-time Notifications</h5>
+                            <p class="text-muted">Instant email notifications for task assignments and work update alerts for administrators.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 mb-4">
+                    <div class="d-flex align-items-start">
+                        <i class="fa-solid fa-file-upload text-success fs-3 me-3"></i>
+                        <div>
+                            <h5>File Management</h5>
+                            <p class="text-muted">Upload and manage task-related files with secure storage and easy access.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 mb-4">
+                    <div class="d-flex align-items-start">
+                        <i class="fa-solid fa-search text-info fs-3 me-3"></i>
+                        <div>
+                            <h5>Advanced Filtering</h5>
+                            <p class="text-muted">Powerful search and filter capabilities to quickly find and organize tasks by status, priority, or assignee.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Team Section -->
+        <!-- <section class="team-section py-5 text-center">
+            <h2 class="mb-5">Our Development Team</h2>
+            <div class="row justify-content-center">
+                <div class="col-md-6 col-lg-4">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body">
+                            <i class="fa-solid fa-user-circle text-primary fs-1 mb-3"></i>
+                            <h5 class="card-title">Uzzal Bhuiyan</h5>
+                            <p class="card-text text-muted">Lead Developer</p>
+                            <p class="card-text">Full-stack developer specializing in Django and modern web technologies. Passionate about creating efficient and user-friendly applications.</p>
+                            <div class="social-links">
+                                <a href="#" class="text-primary me-3"><i class="fa-brands fa-linkedin"></i></a>
+                                <a href="#" class="text-info me-3"><i class="fa-brands fa-github"></i></a>
+                                <a href="mailto:uzzalbhuiyan905@gmail.com" class="text-danger"><i class="fa-solid fa-envelope"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section> -->
+
+        <!-- Contact CTA Section -->
+        <!-- <section class="contact-cta-section py-5 bg-primary text-white rounded text-center">
+            <h2 class="mb-3">Ready to Get Started?</h2>
+            <p class="mb-4">Join our platform today and experience the power of efficient task management.</p>
+            <div>
+                <a href="{% url 'tasks:registration' %}" class="btn btn-light btn-lg me-3">Register Now</a>
+                <a href="{% url 'tasks:contactPage' %}" class="btn btn-outline-light btn-lg">Contact Us</a>
+            </div>
+        </section> -->
+    </div>
+
+    {% include 'footer.html' %}
+{% endblock body %}

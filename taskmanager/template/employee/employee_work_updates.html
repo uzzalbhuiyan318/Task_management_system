@@ -1,0 +1,207 @@
+{% extends 'admin/admin_base.html' %}
+{% load tz %}
+
+{% block title %}{% if user.user_type == 'employee' or user.user_type == '2' %}Employee Panel - My Work Updates{% else %}Admin Panel - Work Updates{% endif %}{% endblock %}
+
+{% block content %}
+<style>
+    .update-card {
+        border-left: 5px solid #0d6efd;
+        transition: box-shadow 0.3s ease;
+        margin-bottom: 1.5rem;
+    }
+    .update-card:hover {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .update-card.approved {
+        border-left-color: #198754;
+        background-color: #f8fff9;
+    }
+    .update-card.rejected {
+        border-left-color: #dc3545;
+        background-color: #fff8f8;
+    }
+    .update-card.pending {
+        border-left-color: #ffc107;
+        background-color: #fffef5;
+    }
+    .update-body {
+        white-space: pre-wrap;
+        background-color: #f8f9fa;
+        padding: 1rem;
+        border-radius: 5px;
+    }
+    .status-badge {
+        font-size: 0.85em;
+        padding: 0.4em 0.8em;
+    }
+    .admin-reply {
+        background-color: #e3f2fd;
+        border: 1px solid #bbdefb;
+        padding: 1rem;
+        border-radius: 5px;
+        margin-top: 1rem;
+    }
+    .admin-reply.rejected {
+        background-color: #ffebee;
+        border-color: #ffcdd2;
+    }
+    .admin-reply.approved {
+        background-color: #e8f5e8;
+        border-color: #c8e6c9;
+    }
+    .timeline-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 18px;
+    }
+    .timeline-icon.pending {
+        background-color: #ffc107;
+    }
+    .timeline-icon.approved {
+        background-color: #198754;
+    }
+    .timeline-icon.rejected {
+        background-color: #dc3545;
+    }
+</style>
+
+<div class="container-fluid mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 text-gray-800">
+            <i class="bi bi-clock-history me-2"></i>My Work Updates
+        </h1>
+    </div>
+    
+    <p class="mb-4 text-muted">
+        View the status of your task updates and admin feedback. Updates are reviewed by administrators before being applied.
+    </p>
+
+    <div class="row">
+        {% for update in work_updates %}
+            <div class="col-12">
+                <div class="card update-card {{ update.review_status }}">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div class="d-flex align-items-center">
+                                <div class="timeline-icon {{ update.review_status }} me-3">
+                                    {% if update.review_status == 'pending' %}
+                                        <i class="bi bi-clock"></i>
+                                    {% elif update.review_status == 'approved' %}
+                                        <i class="bi bi-check"></i>
+                                    {% elif update.review_status == 'rejected' %}
+                                        <i class="bi bi-x"></i>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <h5 class="card-title mb-1">
+                                        <i class="bi bi-clipboard-check me-2"></i>
+                                        {{ update.task.task_name }}
+                                    </h5>
+                                    <small class="text-muted">
+                                        <i class="bi bi-clock"></i> Submitted on {{ update.created_at|localtime|date:"M d Y, h:i A" }}
+                                    </small>
+                                </div>
+                            </div>
+                            <div>
+                                {% if update.review_status == 'pending' %}
+                                    <span class="badge bg-warning status-badge">
+                                        <i class="bi bi-hourglass-split"></i> Pending Review
+                                    </span>
+                                {% elif update.review_status == 'approved' %}
+                                    <span class="badge bg-success status-badge">
+                                        <i class="bi bi-check-circle"></i> Approved
+                                    </span>
+                                {% elif update.review_status == 'rejected' %}
+                                    <span class="badge bg-danger status-badge">
+                                        <i class="bi bi-x-circle"></i> Rejected
+                                    </span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            {% if update.previous_status %}
+                            <div class="col-md-6">
+                                <strong>Previous Status:</strong> 
+                                <span class="badge bg-secondary">{{ update.previous_status }}</span>
+                            </div>
+                            {% endif %}
+                            <div class="col-md-6">
+                                <strong>Requested Status:</strong> 
+                                <span class="badge bg-primary">{{ update.new_status }}</span>
+                            </div>
+                        </div>
+
+                        {% if update.employee_comment %}
+                        <div class="mb-3">
+                            <strong>Your Comment:</strong>
+                            <div class="update-body">{{ update.employee_comment }}</div>
+                        </div>
+                        {% endif %}
+
+                        {% if update.review_status != 'pending' %}
+                            <div class="admin-reply {{ update.review_status }}">
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="bi bi-shield-check text-primary me-2"></i>
+                                    <strong>
+                                        Admin Response 
+                                        {% if update.reviewed_by %}
+                                            ({{ update.reviewed_by.username }})
+                                        {% endif %}
+                                    </strong>
+                                    <small class="text-muted ms-auto">
+                                        {{ update.reviewed_at|localtime|date:"M d Y, h:i A" }}
+                                    </small>
+                                </div>
+                                
+                                {% if update.review_status == 'approved' %}
+                                    <div class="alert alert-success mb-2 py-2">
+                                        <i class="bi bi-check-circle me-1"></i>
+                                        <strong>Your update has been approved!</strong> The task status has been updated.
+                                    </div>
+                                {% elif update.review_status == 'rejected' %}
+                                    <div class="alert alert-danger mb-2 py-2">
+                                        <i class="bi bi-x-circle me-1"></i>
+                                        <strong>Your update was rejected.</strong> The task status remains unchanged.
+                                    </div>
+                                {% endif %}
+
+                                {% if update.admin_reply %}
+                                    <div class="mt-2">
+                                        <strong>Admin Comment:</strong>
+                                        <p class="mb-0 mt-1">{{ update.admin_reply }}</p>
+                                    </div>
+                                {% else %}
+                                    <p class="mb-0 text-muted fst-italic">No additional comment provided.</p>
+                                {% endif %}
+                            </div>
+                        {% else %}
+                            <div class="alert alert-info mb-0">
+                                <i class="bi bi-info-circle me-2"></i>
+                                <strong>Waiting for admin review...</strong> Your update is pending approval.
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12">
+                <div class="alert alert-info text-center" role="alert">
+                    <i class="bi bi-info-circle me-2"></i>
+                    You haven't submitted any task updates yet.
+                    <br><br>
+                    <a href="{% url 'tasks:task_list' %}" class="btn btn-primary">
+                        <i class="bi bi-clipboard-check me-1"></i> Go to Task List
+                    </a>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

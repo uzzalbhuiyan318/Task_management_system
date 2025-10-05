@@ -1,4 +1,5 @@
 {% extends 'admin/admin_base.html' %}
+{% load tz %}
 
 {% block title %}Message: {{ message.subject|truncatechars:30 }}{% endblock %}
 
@@ -33,7 +34,7 @@
             <div class="d-flex justify-content-between align-items-center">
                 <h4 class="mb-0">{{ message.subject }}</h4>
                 <span class="badge bg-light text-dark">
-                    <i class="bi bi-clock me-1"></i>{{ message.timestamp|date:"M d, Y h:i A" }}
+                    <i class="bi bi-clock me-1"></i>{{ message.timestamp|localtime|date:"M d, Y h:i A" }}
                 </span>
             </div>
         </div>

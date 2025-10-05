@@ -46,6 +46,9 @@
     border-radius: 50%;
     border: 4px solid #dee2e6;
     box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .edit-btn {
@@ -68,7 +71,7 @@
       <div class="profile-card text-center">
 
         {% if user.is_authenticated %}
-          {% if user.user_type == '1' or user.is_staff %}
+          {% if user.user_type == '1' or user.user_type == 'admin' %}
             <h2 class="profile-title admin-title mb-4">Admin Profile</h2>
           {% elif user.user_type == '2' %}
             <h2 class="profile-title employee-title mb-4">Employee Profile</h2>
@@ -77,9 +80,17 @@
 
         <!-- Profile Image -->
         <div class="mb-4">
-          <img src="{{ request.user.profile_pic.url }}"
-               alt="Profile Picture"
-               class="profile-img" />
+          {% if request.user.profile_pic %}
+            <img src="{{ request.user.profile_pic.url }}"
+                 alt="Profile Picture"
+                 class="profile-img" 
+                 onerror="this.src='https://via.placeholder.com/140x140/6c757d/ffffff?text=No+Image'" />
+          {% else %}
+            <div class="profile-img d-flex align-items-center justify-content-center" 
+                 style="background-color: #6c757d; color: white; font-size: 24px; font-weight: bold;">
+              {{ request.user.username|first|upper|default:"U" }}
+            </div>
+          {% endif %}
         </div>
 
         <!-- User Info -->
@@ -90,12 +101,12 @@
 
         <div class="text-start mb-3 row">
           <label class="col-sm-4 profile-label">Email:</label>
-          <div class="col-sm-8 profile-value">{{ request.user.email }}</div>
+          <div class="col-sm-8 profile-value">{{ request.user.email|default:"Not provided" }}</div>
         </div>
 
         <div class="text-start mb-3 row">
           <label class="col-sm-4 profile-label">Contact No:</label>
-          <div class="col-sm-8 profile-value">{{ request.user.contact_no }}</div>
+          <div class="col-sm-8 profile-value">{{ request.user.contact_no|default:"Not provided" }}</div>
         </div>
 
         <div class="text-start mb-3 row">
@@ -110,6 +121,19 @@
             {% endif %}
           </div>
         </div>
+
+        <!-- Employee-specific fields (if profile exists) -->
+        {% if profile %}
+        <div class="text-start mb-3 row">
+          <label class="col-sm-4 profile-label">Address:</label>
+          <div class="col-sm-8 profile-value">{{ profile.address|default:"Not provided" }}</div>
+        </div>
+
+        <div class="text-start mb-3 row">
+          <label class="col-sm-4 profile-label">Job Post:</label>
+          <div class="col-sm-8 profile-value">{{ profile.job_post|default:"Not assigned" }}</div>
+        </div>
+        {% endif %}
 
         <!-- Edit Button -->
         <div class="text-center mt-4">

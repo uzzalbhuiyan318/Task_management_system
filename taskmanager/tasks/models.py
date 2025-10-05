@@ -1,32 +1,29 @@
 from django.db import models
-from django.utils import timezone
 from django.contrib.auth.models import AbstractUser
 
 # Create your models here.
 class CustomUser(AbstractUser):
-        GENDER =[
-        ('male','Male'),
-        ('female','Female'),
-        ('others','Others'),
-        ]
-        
-        USER_TYPE = [
-            ('employee', 'Employee'),
-            ('admin', 'Admin'),
-        ]
-        user_type = models.CharField(max_length=20,choices=USER_TYPE, null=True)
-        username = models.CharField(max_length=30, null=True, unique=True)
-        gender = models.CharField(choices=GENDER, null=True, max_length=20)
-        age = models.IntegerField(null=True)
-        contact_no = models.CharField(max_length=25, null=True)
-        profile_pic = models.ImageField(upload_to='Media/profile_pic', null=True)
-        
-        
-        USERNAME_FIELD = 'username'
-        REQUIRED_FIELDS = []
-        
-        def __str__(self):
-            return f"username: {self.username}"
+    GENDER = [
+        ('male', 'Male'),
+        ('female', 'Female'),
+        ('others', 'Others'),
+    ]
+    USER_TYPE = [
+        ('employee', 'Employee'),
+        ('admin', 'Admin'),
+    ]
+    user_type = models.CharField(max_length=20, choices=USER_TYPE, null=True)
+    username = models.CharField(max_length=30, null=True, unique=True)
+    gender = models.CharField(choices=GENDER, null=True, max_length=20)
+    age = models.IntegerField(null=True)
+    contact_no = models.CharField(max_length=25, null=True)
+    profile_pic = models.ImageField(upload_to='Media/profile_pic', null=True)
+
+    USERNAME_FIELD = 'username'
+    REQUIRED_FIELDS = []
+
+    def __str__(self):
+        return f"username: {self.username}"
 
 
 class Task(models.Model):
@@ -52,31 +49,83 @@ class Task(models.Model):
     created_date = models.DateTimeField(auto_now_add=True)
     comment = models.TextField(blank=True, null=True)
     upload = models.FileField(upload_to='documents/files', null=True)
+    employee_seen = models.BooleanField(default=False, help_text='Whether the assigned employee has seen this task')
     
     def __str__(self):
-        return self.task_name
+        return str(self.task_name)
 
 class EmployeeProfile(models.Model):
-    
     username = models.ForeignKey('CustomUser', on_delete=models.CASCADE, related_name='employee')
     address = models.CharField(max_length=255, null=True)
-    job_post = models.CharField(max_length= 50, null=True)
-    
-    
+    job_post = models.CharField(max_length=50, null=True)
+
     def __str__(self):
-        return f"username: {self.username}"
+        return f"username: {self.username.username}"
 
 
 class AdminProfile(models.Model):
     username = models.OneToOneField('CustomUser', on_delete=models.CASCADE, related_name='admin')
     role = models.CharField(max_length=100, null=True)
     permissions = models.TextField(null=True)
+
+    def __str__(self):
+        return f"Admin Profile for {self.username.username}"
+
+
+class ContactMessage(models.Model):
+    name = models.CharField(max_length=100)
+    email = models.EmailField()
+    message = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+    is_read = models.BooleanField(default=False)
     
     def __str__(self):
-        
-        return f"Admin Profile for {self.username}"
+        return f"Message from {self.name} - {self.email}"
     
+    class Meta:
+        ordering = ['-timestamp']
 
+
+
+class WorkUpdate(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Pending Review'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
+    ]
+    
+    task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name='work_updates')
+    employee = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='submitted_updates')
+    previous_status = models.CharField(max_length=20, null=True, blank=True)
+    new_status = models.CharField(max_length=20)
+    employee_comment = models.TextField(blank=True, null=True)
+    
+    # Admin review fields
+    review_status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    reviewed_by = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True, related_name='reviewed_updates')
+    admin_reply = models.TextField(blank=True, null=True)
+    reviewed_at = models.DateTimeField(null=True, blank=True)
+    employee_seen = models.BooleanField(default=False, help_text='Whether the employee has seen the admin review')
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return f"Update for {self.task.task_name} by {self.employee.username}"
+    
+    class Meta:
+        ordering = ['-created_at']
+        
+        
+class testForm(models.Model):
+    name = models.CharField(max_length=100)
+    email = models.EmailField()
+    message = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return f"TestForm from {self.name} - {self.email}"
+    
 
     
     

@@ -1,0 +1,613 @@
+/* --- Contact Page Styles --- */
+.contact-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #1a237e;
+    margin-bottom: 32px;
+    text-align: center;
+    letter-spacing: -1px;
+}
+
+.contact-container {
+    max-width: 900px;
+    min-height: 70vh;
+    margin: 48px auto 32px auto;
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 8px 32px rgba(26,35,126,0.10);
+    padding: 40px 32px 32px 32px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.contact-body {
+    display: flex;
+    gap: 40px;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.contact-left {
+    flex: 1 1 60%;
+}
+
+.contact-right {
+    flex: 1 1 40%;
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 24px 20px;
+    box-shadow: 0 2px 8px rgba(26,35,126,0.04);
+    margin-top: 12px;
+}
+.contact-right h2 {
+    font-size: 1.3rem;
+    color: #1a237e;
+    margin-bottom: 12px;
+}
+.contact-right p {
+    color: #374151;
+    font-size: 1.05rem;
+    margin-bottom: 8px;
+}
+.form-group {
+    margin-bottom: 22px;
+}
+.form-group label {
+    font-weight: 600;
+    color: #1a237e;
+    margin-bottom: 6px;
+    display: block;
+}
+.form-control {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1.5px solid #cfd8dc;
+    border-radius: 8px;
+    font-size: 1rem;
+    background: #f8fafc;
+    color: #222;
+    transition: border 0.2s;
+}
+.form-control:focus {
+    border-color: #1a237e;
+    outline: none;
+    background: #fff;
+}
+.btn-contact {
+    background: #1a237e;
+    color: #fff;
+    border: none;
+    padding: 0.7rem 2.2rem;
+    font-size: 1.1rem;
+    border-radius: 30px;
+    box-shadow: 0 2px 8px rgba(26,35,126,0.08);
+    transition: background 0.2s;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+}
+.btn-contact:hover {
+    background: #3949ab;
+    color: #fff;
+}
+
+@media (max-width: 767px) {
+    .contact-body {
+        flex-direction: column;
+        gap: 24px;
+    }
+    .contact-container {
+        padding: 24px 16px;
+        min-height: 60vh;
+        margin: 24px auto; /* keep a bit of page margin */
+        justify-content: flex-start;
+        width: calc(100% - 32px);
+    }
+    .contact-left, .contact-right {
+        width: 100%;
+    }
+    .contact-container { align-items: stretch; }
+}
+
+.hero-image{
+    width: 100%;
+    max-width: 480px;
+    height: auto;
+    margin-top: 0;
+    border-radius: 18px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+    background: #fff;
+}
+
+.display-4{
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    color: #1a237e;
+
+}
+
+.hero-section {
+    background: linear-gradient(120deg, #f8fafc 0%, #e0e7ef 100%);
+    padding: 80px 0 60px 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-section .container {
+    position: relative;
+    z-index: 2;
+}
+
+.hero-section h1 {
+    color: #1a237e;
+    font-size: 3.2rem;
+    font-weight: 800;
+    margin-bottom: 1.2rem;
+    letter-spacing: -1px;
+}
+
+.hero-section .lead {
+    color: #374151;
+    font-size: 1.25rem;
+    margin-bottom: 2rem;
+}
+
+.hero-section .btn-primary {
+    background: #1a237e;
+    color: #fff;
+    border: none;
+    padding: 0.75rem 2.2rem;
+    font-size: 1.1rem;
+    border-radius: 30px;
+    box-shadow: 0 2px 8px rgba(26,35,126,0.08);
+    transition: background 0.2s;
+}
+.hero-section .btn-primary:hover {
+    background: #3949ab;
+    color: #fff;
+}
+
+@media (max-width: 991px) {
+    .hero-section .row {
+        flex-direction: column-reverse;
+        text-align: center;
+    }
+    .hero-image {
+        margin: 0 auto 32px auto;
+    }
+    .hero-section h1 {
+        font-size: 2.2rem;
+    }
+}
+
+/* main section start here */
+.main{
+    padding: 60px 0;
+    text-align: center;
+}
+
+/* Partner cards in grid layout (2 per row) */
+.partner-item-static {
+    padding: 15px;
+    margin-bottom: 30px;
+}
+
+.partner-item-static img {
+    max-height: 120px;
+    width: auto;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(26,35,126,0.15);
+    transition: transform 0.3s, box-shadow 0.3s;
+    filter: grayscale(0.2) brightness(0.95);
+    opacity: 0.92;
+}
+
+.partner-item-static img:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(26,35,126,0.25);
+    filter: none;
+    opacity: 1;
+}
+
+@media (max-width: 768px) {
+    .partner-item-static {
+        padding: 10px;
+        margin-bottom: 20px;
+    }
+    .partner-item-static img {
+        max-height: 80px;
+    }
+}
+/* Partner section animation - moves LEFT TO RIGHT */
+.partner {
+    overflow: hidden;
+    width: 100%;
+    position: relative;
+    background: transparent;
+    padding: 24px 0 16px 0;
+}
+
+.partner .partner-track {
+    display: flex;
+    align-items: center;
+    width: max-content;
+    animation: partner-move-home 18s linear infinite;
+}
+
+.partner-item {
+    margin: 0 32px;
+    height: 120px;
+    display: flex;
+    align-items: center;
+    transition: transform 0.3s;
+}
+.partner-item img {
+    height: 100%;
+    width: auto;
+    display: block;
+    filter: grayscale(0.2) brightness(0.95);
+    opacity: 0.92;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(26,35,126,0.08);
+}
+.partner-item:hover {
+    transform: scale(1.08);
+    z-index: 2;
+    filter: none;
+    opacity: 1;
+}
+
+@keyframes partner-move-home {
+    0% {
+        transform:translateX(-50%);
+    }
+    100% {
+        transform:translateX(calc(100vw + 50%));  
+    }
+}
+
+@media (max-width: 991px) {
+    .partner {
+        padding: 12px 0 8px 0;
+    }
+    .partner-item {
+        margin: 0 12px;
+        height: 48px;
+    }
+}
+/* Partner item linear animation */
+.partner-animate-container {
+    overflow: hidden;
+    width: 100%;
+    position: relative;
+    background: transparent;
+}
+
+.partner-animate-track {
+    display: flex;
+    align-items: center;
+    width: max-content;
+    animation: partner-linear-move 6s linear infinite;
+}
+
+@keyframes partner-linear-move {
+    0% {
+        transform: translateX(-50%);
+    }
+    100% {
+        transform: translateX(50%);
+    }
+}
+/* partner section ends here */
+
+/* body content start here */
+.body-content {
+    display: flex;
+    justify-content: space-between;
+    padding: 40px 0;
+}
+
+.left-content {
+    flex: 1;
+    padding-right: 20px;
+    height: 400px;
+    width: 100%;
+
+}
+
+.left-content h3 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #1a237e;
+    margin-bottom: 20px;
+}
+.left-content p {
+    font-size: 1rem;
+    padding: 0 5px 0 5px;
+    color: #374151;
+    text-align: justify;
+}
+
+.right-content {
+    flex: 1;
+    padding-left: 20px;
+    height: 400px;
+    width: 100%;
+    
+}
+.right-content img{
+    border-radius: 18px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+    background: #fff;
+}
+
+/* pre-footer start here CTA */
+.pre-footer{
+    background: linear-gradient(120deg, #12203a 0%, #1a237e 100%);
+    color: #fff;
+}
+.pre-footer .pre-footer-title{
+    font-size: 2.6rem;
+    font-weight: 700;
+    margin-bottom: 0.6rem;
+}
+.pre-footer .pre-footer-sub{
+    color: rgba(224,231,239,0.9);
+    font-size: 1.15rem;
+    margin-bottom: 1rem;
+}
+.pre-footer .pre-footer-actions .btn-primary{
+    background: #0d47a1;
+    border: none;
+    padding: 0.85rem 2.4rem;
+    border-radius: 10px;
+    font-size: 1.05rem;
+}
+.pre-footer .pre-footer-actions .btn-primary:hover{
+    background: #0b3b87;
+}
+.pre-footer .pre-footer-actions .btn-outline-light{
+    border-radius: 10px;
+    padding: 0.75rem 2rem;
+    border: 1.5px solid rgba(255,255,255,0.85);
+    color: #fff;
+}
+.pre-footer .pre-footer-actions .btn-outline-light:hover{
+    background: rgba(255,255,255,0.06);
+}
+
+@media (max-width: 767px) {
+    .pre-footer .pre-footer-title{
+        font-size: 1.8rem;
+    }
+    .pre-footer .pre-footer-sub{
+        font-size: 1rem;
+    }
+    .pre-footer .pre-footer-actions .btn{
+        display: block;
+        width: 100%;
+        margin-bottom: 12px;
+    }
+}
+
+
+/* footer start here */
+/* left */
+.footer{
+    background: rgb(246, 245, 245);
+    color: black;
+    padding: 18px 0; /* compact vertical spacing */
+    min-height: 80px; /* ensure a sensible minimum height */
+}
+
+.footer .container {
+    position: relative;
+    z-index: 2;
+}
+
+
+.footer .footer-left {
+    display: flex;
+    flex-direction: column; /* show logo and text side-by-side on desktop */
+    align-items: center;
+    gap: 18px;
+    padding: 8px 0;
+    background: transparent;
+}
+
+.footer .footer-left img {
+    max-width: 80px;
+    min-width: 48px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(26,35,126,0.10);
+    margin-right: 0;
+}
+
+/* Footer-specific logo override (controlled from styles.css) */
+.footer .footer-left img.footer-logo {
+    /* ensure footer logo ignores the generic max-width and uses the designed size */
+    max-width: none !important;
+    min-width: auto !important;
+    width: 160px !important;
+    height: 60px !important;
+    object-fit: contain;
+    border-radius: 0px !important;
+    box-shadow: 0px 0px 0px 0px !important;
+    display: inline-block;
+}
+
+.footer .footer-left p {
+    margin: 0;
+    color: black;
+    font-size: 1rem;
+    line-height: 1.6;
+    font-weight: 400;
+    letter-spacing: 0.01em;
+    max-width: 260px;
+    text-align: justify;
+}
+
+@media (max-width: 991px) {
+    .footer .row {
+        flex-direction: column;
+        text-align: center;
+    }
+    .footer .footer-left {
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        padding-bottom: 10px;
+    }
+    .footer .footer-left img {
+        margin-bottom: 8px;
+    }
+    .footer .col-lg-4 {
+        margin-bottom: 12px;
+    }
+}
+
+/* middle */
+.footer .footer-middle {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 18px 0;
+
+}
+
+.footer-middle li {
+    list-style: none;
+    margin: 0 0 8px 0;
+    
+}
+
+.footer-middle li a{
+    color: black;
+    text-decoration: none;
+    transition: color 0.2s;
+    
+}
+
+.footer-middle li a:hover{
+    color: red;
+    opacity: 0.9;
+    transition: color 0.2s;
+
+}
+
+
+
+/* right */
+.footer .footer-right {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 18px 0;
+}
+
+.footer .footer-right li{
+    list-style: none;
+    margin: 0 0 8px 0;
+}
+
+.footer .footer-right li a{
+    color: black;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.footer .footer-right li a:hover{
+    color: red;
+    opacity: 0.9;
+    transition: color 0.2s;
+
+}
+
+.footer .footer-right li a .fa-brands{
+    font-size: 1.2rem;
+}
+
+
+/* Logo sizing */
+.topnav {
+    overflow: hidden;
+    background: rgb(246, 245, 245);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    padding: 5px 40px 5px 20px;
+}
+.topnav img.logo,
+.logo {
+    height: 50px;
+    width: 160px;
+    object-fit: contain;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.topnav a {
+    color: black;
+    opacity: 0.8;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    font-weight: 550;
+    font-size: 1.2rem;
+    vertical-align: middle !important;
+    display: inline-flex;
+    align-items: center; 
+    gap: 8px;
+}
+
+.topnav a.split {
+    color: black;
+    vertical-align: middle;
+}
+.topnav a.split:hover {
+    opacity: 1;
+    transform: scaleX(1.05);
+    cursor: pointer;
+}
+
+/* Make topnav a flex container and vertically center items */
+.topnav {
+    display: flex;
+    align-items: center;
+}
+
+/* Make links align their contents and use the first anchor (logo) as spacer */
+.topnav a {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Push remaining links to right using the logo anchor as spacer */
+.topnav a:first-child {
+    margin-right: 0;
+}
+
+/* Nav-links utility: switch alignment by changing the class on .nav-links */
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.nav-links.left {
+    justify-content: flex-start;
+}
+.nav-links.center {
+    justify-content: center;
+    margin: 0 auto; /* centers the group inside the topnav */
+}
+.nav-links.right {
+    justify-content: flex-end;
+    margin-left: auto; /* push this nav-links container to the right edge */
+}
+
+
+
+

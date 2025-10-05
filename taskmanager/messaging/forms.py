@@ -16,5 +16,5 @@ class MessageForm(forms.ModelForm):
         fields = ['recipient', 'subject', 'body']
         widgets = {
             'subject': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the subject'}),
-            'body': forms.Textarea(attrs={'class': 'form-control', 'rows': 8, 'placeholder': 'Write your message...'}),
+            'body': forms.Textarea(attrs={'class': 'form-control', 'rows': 8, 'placeholder': 'Write your Message here...'}),
         }

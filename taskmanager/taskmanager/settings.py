@@ -1,7 +1,16 @@
 from pathlib import Path
 import os
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+# Build paths inside the project like this: BASE_DIR / # Internationalization
+# https://docs.djangoproject.com/en/5.0/topics/i18n/
+
+LANGUAGE_CODE = "en-us"
+
+TIME_ZONE = "Asia/Dhaka"
+
+USE_I18N = True
+
+USE_TZ = True
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
@@ -67,13 +76,8 @@ WSGI_APPLICATION = "taskmanager.wsgi.application"
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'task_manager_db', 
-        'USER': 'root',             
-        'PASSWORD': '',              
-        'HOST': '127.0.0.1',         
-        'PORT': '3306',   
-        'OPTIONS': {'sql_mode': 'STRICT_TRANS_TABLES'},
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 
@@ -102,7 +106,8 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = "UTC"
+# TIME_ZONE is set at the top of this file as "Asia/Dhaka"
+# No need to override it here
 
 USE_I18N = True
 
@@ -126,6 +131,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 LOGIN_URL = "/login_required_view/"
+LOGIN_REDIRECT_URL = "/"  # This will go to home, but our custom logic will handle user-type specific redirects
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 

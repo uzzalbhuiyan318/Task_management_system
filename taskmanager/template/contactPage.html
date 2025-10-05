@@ -1,0 +1,47 @@
+
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Contact Us{% endblock title %}
+{% block body %}
+    <div class="container contact-container my-5">
+        <h1 class="contact-title">Contact Us</h1>
+        
+        <!-- Display Messages -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+        
+        <div class="contact-body d-flex gap-4">
+            <div class="contact-left flex-fill">
+                <form method="post" action="{% url 'tasks:contactPage' %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Name:</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email:</label>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="message" class="form-label">Message:</label>
+                        <textarea class="form-control" id="message" name="message" rows="5" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Send Message</button>
+                </form>
+            </div>
+            <div class="contact-right" style="min-width:260px;">
+                <h2>Contact Information</h2>
+                <p><strong>Address:</strong> <i>House 29, Road 12, Sector 10, Uttara, Dhaka-1230</i></p>
+                <p><strong>Email:</strong> uzzalbhuiyan905@gmail.com</p>
+                <p><strong>Phone:</strong> +880 1741818807</p>
+            </div>
+        </div>
+    </div>
+{% include 'footer.html' %}
+{% endblock body %}

@@ -1,6 +1,7 @@
 {% extends 'admin/admin_base.html' %}
+{% load tz %}
 
-{% block title %}Work Updates{% endblock %}
+{% block title %}Admin Panel - Work Updates{% endblock %}
 
 {% block content %}
 <style>
@@ -11,39 +12,200 @@
     .update-card:hover {
         box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
+    .update-card.approved {
+        border-left-color: #198754;
+        background-color: #f8fff9;
+    }
+    .update-card.rejected {
+        border-left-color: #dc3545;
+        background-color: #fff8f8;
+    }
+    .update-card.pending {
+        border-left-color: #ffc107;
+        background-color: #fffef5;
+    }
     .update-body {
-        white-space: pre-wrap; /* This preserves newlines from the database */
+        white-space: pre-wrap;
         background-color: #f8f9fa;
         padding: 1rem;
         border-radius: 5px;
+    }
+    .status-badge {
+        font-size: 0.85em;
+        padding: 0.4em 0.8em;
+    }
+    .admin-actions {
+        border-top: 1px solid #dee2e6;
+        padding-top: 1rem;
+        margin-top: 1rem;
+    }
+    .admin-reply {
+        background-color: #e9ecef;
+        padding: 0.8rem;
+        border-radius: 5px;
+        margin-top: 0.5rem;
     }
 </style>
 
 <div class="container-fluid">
     <h1 class="h3 mb-4 text-gray-800">Work Updates</h1>
-    <p class="mb-4">Here are the latest task status and comment updates submitted by employees.</p>
+    <p class="mb-4">Review task status updates submitted by employees. You can approve or reject each update.</p>
 
     <div class="list-group">
-        {% for update in updates %}
-            <div class="card update-card mb-3">
+        {% for update in work_updates %}
+            <div class="card update-card mb-3 {{ update.review_status }}">
                 <div class="card-body">
                     <div class="d-flex w-100 justify-content-between mb-2">
-                        <h5 class="card-title mb-0">{{ update.subject }}</h5>
-                        {% if update.timestamp %} {# Assumes your Message model has a 'timestamp' field #}
-                            <small class="text-muted">{{ update.timestamp|date:"d M Y, h:i A" }}</small>
-                        {% endif %}
+                        <h5 class="card-title mb-0">
+                            <i class="bi bi-clipboard-check me-2"></i>
+                            {{ update.task.task_name }}
+                        </h5>
+                        <div>
+                            {% if update.review_status == 'pending' %}
+                                <span class="badge bg-warning status-badge">Pending Review</span>
+                            {% elif update.review_status == 'approved' %}
+                                <span class="badge bg-success status-badge">Approved</span>
+                            {% elif update.review_status == 'rejected' %}
+                                <span class="badge bg-danger status-badge">Rejected</span>
+                            {% endif %}
+                        </div>
                     </div>
                     
-                    <p class="card-text update-body">{{ update.body }}</p>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <small class="text-muted">
+                                <i class="bi bi-person-fill"></i> Submitted by: <strong>{{ update.employee.username }}</strong>
+                            </small>
+                        </div>
+                        <div class="col-md-6 text-md-end">
+                            <small class="text-muted">
+                                <i class="bi bi-clock"></i> {{ update.created_at|localtime|date:"d M Y, h:i A" }}
+                            </small>
+                        </div>
+                    </div>
 
-                    <small class="text-muted">Submitted by: <strong>{{ update.sender.username }}</strong></small>
+                    <div class="row mb-3">
+                        {% if update.previous_status %}
+                        <div class="col-md-6">
+                            <strong>Previous Status:</strong> 
+                            <span class="badge bg-secondary">{{ update.previous_status }}</span>
+                        </div>
+                        {% endif %}
+                        <div class="col-md-6">
+                            <strong>New Status:</strong> 
+                            <span class="badge bg-primary">{{ update.new_status }}</span>
+                        </div>
+                    </div>
+
+                    {% if update.employee_comment %}
+                    <div class="mb-3">
+                        <strong>Employee Comment:</strong>
+                        <div class="update-body">{{ update.employee_comment }}</div>
+                    </div>
+                    {% endif %}
+
+                    {% if update.review_status != 'pending' %}
+                        <div class="admin-reply">
+                            <strong>
+                                <i class="bi bi-shield-check"></i> 
+                                Admin Review ({{ update.reviewed_by.username }} - {{ update.reviewed_at|localtime|date:"d M Y, h:i A" }}):
+                            </strong>
+                            {% if update.admin_reply %}
+                                <p class="mb-0 mt-2">{{ update.admin_reply }}</p>
+                            {% else %}
+                                <p class="mb-0 mt-2 text-muted">No admin comment provided.</p>
+                            {% endif %}
+                        </div>
+                    {% else %}
+                        <div class="admin-actions" id="actions-{{ update.id }}">
+                            <div class="row">
+                                <div class="col-12 mb-3">
+                                    <label for="reply-{{ update.id }}" class="form-label">
+                                        <strong>Admin Reply (Optional):</strong>
+                                    </label>
+                                    <textarea 
+                                        id="reply-{{ update.id }}" 
+                                        class="form-control" 
+                                        rows="3" 
+                                        placeholder="Add your comments or feedback..."></textarea>
+                                </div>
+                                <div class="col-12">
+                                    <button 
+                                        type="button" 
+                                        class="btn btn-success me-2 approve-btn" 
+                                        data-update-id="{{ update.id }}">
+                                        <i class="bi bi-check-circle"></i> Approve
+                                    </button>
+                                    <button 
+                                        type="button" 
+                                        class="btn btn-danger reject-btn" 
+                                        data-update-id="{{ update.id }}">
+                                        <i class="bi bi-x-circle"></i> Reject
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
         {% empty %}
             <div class="alert alert-info text-center" role="alert">
-              There are no new work updates to display.
+                <i class="bi bi-info-circle me-2"></i>
+                There are no work updates to display.
             </div>
         {% endfor %}
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const csrfToken = '{{ csrf_token }}';
+    
+    // Handle approve button clicks
+    document.querySelectorAll('.approve-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const updateId = this.getAttribute('data-update-id');
+            const adminReply = document.getElementById(`reply-${updateId}`).value;
+            handleWorkUpdate(updateId, 'approve', adminReply);
+        });
+    });
+    
+    // Handle reject button clicks
+    document.querySelectorAll('.reject-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const updateId = this.getAttribute('data-update-id');
+            const adminReply = document.getElementById(`reply-${updateId}`).value;
+            handleWorkUpdate(updateId, 'reject', adminReply);
+        });
+    });
+    
+    function handleWorkUpdate(updateId, action, adminReply) {
+        const url = action === 'approve' 
+            ? `{% url 'tasks:approve_work_update' 0 %}`.replace('0', updateId)
+            : `{% url 'tasks:reject_work_update' 0 %}`.replace('0', updateId);
+        
+        const formData = new FormData();
+        formData.append('csrfmiddlewaretoken', csrfToken);
+        formData.append('admin_reply', adminReply);
+        
+        fetch(url, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Reload the page to show updated status
+                location.reload();
+            } else {
+                alert('Error: ' + (data.error || 'Unknown error occurred'));
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while processing the request.');
+        });
+    }
+});
+</script>
 {% endblock %}

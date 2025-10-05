@@ -95,7 +95,7 @@
         }
         a{
             text-decoration: none;
-            color: white;
+            color: white !important;
         }
         .button {
             display: inline-block;
@@ -146,7 +146,7 @@
                 <div class="detail-row">
                     <div class="detail-label">Priority:</div>
                     <div class="detail-value">
-                        <span class="priority-{{ task_priority|lower }}">{{ task.priority }}</span>
+                        <span class="priority-{{ task.priority|lower }}">{{ task.priority }}</span>
                     </div>
                 </div>
                 

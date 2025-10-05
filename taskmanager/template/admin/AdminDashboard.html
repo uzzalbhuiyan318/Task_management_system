@@ -1,43 +1,212 @@
-{% extends "admin/admin_base.html" %} {% block content %}
+{% extends "admin/admin_base.html" %}
 
-<div class="container-fluid">
+{% block title %}Admin Panel - Dashboard{% endblock %}
+
+{% block content %}
+
+<style>
+  .admin-dashboard {
+    height: 100vh;
+    overflow-y: auto;
+    background-color: #f8f9fa;
+  }
+
+  .metric-card {
+    background: white;
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .metric-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  }
+
+  .metric-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+  }
+
+  .metric-card.primary::before {
+    background: linear-gradient(90deg, #4285f4 0%, #34a853 100%);
+  }
+
+  .metric-card.warning::before {
+    background: linear-gradient(90deg, #ff9800 0%, #ff5722 100%);
+  }
+
+  .metric-card.info::before {
+    background: linear-gradient(90deg, #00bcd4 0%, #2196f3 100%);
+  }
+
+  .metric-card.success::before {
+    background: linear-gradient(90deg, #4caf50 0%, #8bc34a 100%);
+  }
+
+  .metric-number {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #2c3e50;
+    line-height: 1;
+  }
+
+  .metric-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.5rem;
+  }
+
+  .metric-subtitle {
+    font-size: 0.75rem;
+    color: #9ca3af;
+    font-weight: 500;
+  }
+
+  .dashboard-header {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .chart-card {
+    background: white;
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    height: 350px;
+  }
+
+  .chart-container {
+    height: 280px;
+    position: relative;
+  }
+
+  .quick-actions {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+</style>
+
+<div class="container-fluid admin-dashboard">
+  <!-- Clean Header -->
+  <div class="row mb-3">
+    <div class="col-12">
+      <div class="dashboard-header">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <h1 class="h4 mb-1 fw-bold text-dark">
+              Admin Dashboard
+            </h1>
+            <p class="mb-0 text-muted small">Welcome back! Here's what's happening with your tasks today.</p>
+          </div>
+          <!-- <div class="text-end">
+            <p class="mb-0 text-muted small">Last updated</p>
+            <p class="mb-0 fw-semibold text-dark small">{{ "now"|date:"M d, Y g:i A" }}</p>
+          </div> -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Key Metrics Cards -->
+  <div class="row mb-3">
+    <div class="col-lg-3 col-md-6 mb-3">
+      <div class="metric-card primary">
+        <div class="card-body p-4">
+          <div class="metric-title">Total Assigned</div>
+          <div class="metric-number">{{ total_tasks }}</div>
+          <div class="metric-subtitle">All</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6 mb-3">
+      <div class="metric-card warning">
+        <div class="card-body p-4">
+          <div class="metric-title">Pending</div>
+          <div class="metric-number">{{ pending }}</div>
+          <div class="metric-subtitle">Action</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6 mb-3">
+      <div class="metric-card info">
+        <div class="card-body p-4">
+          <div class="metric-title">In Progress</div>
+          <div class="metric-number">{{ inprogress }}</div>
+          <div class="metric-subtitle">Ongoing</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6 mb-3">
+      <div class="metric-card success">
+        <div class="card-body p-4">
+          <div class="metric-title">Completed</div>
+          <div class="metric-number">{{ completed }}</div>
+          <div class="metric-subtitle">Done</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts Section -->
   <div class="row">
-    <!-- Charts Area -->
-    <div class="col-lg-12 p-4">
-      <div class="row">
-        <!-- Chart 1: Status (Pie) -->
-        <div class="col-lg-4 mb-4">
-          <div class="card shadow rounded-4">
-            <div class="card-body text-center">
-              <h5 class="text-primary mb-3">Task Status Overview</h5>
-              <div style="height: 300px">
-                <canvas id="statusChart"></canvas>
-              </div>
-            </div>
+    <!-- Task Status Chart -->
+    <div class="col-lg-4 mb-3">
+      <div class="chart-card">
+        <div class="card-header bg-white border-0 pb-2">
+          <h6 class="card-title mb-0 fw-semibold text-dark text-center pt-1">Task Status Distribution</h6>
+          <!-- <small class="text-muted">Overview of current task statuses</small> -->
+        </div>
+        <div class="card-body p-3">
+          <div class="chart-container">
+            <canvas id="statusChart"></canvas>
           </div>
         </div>
+      </div>
+    </div>
 
-        <!-- Chart 2: Priority (Bar) -->
-        <div class="col-lg-4 mb-4">
-          <div class="card shadow rounded-4">
-            <div class="card-body text-center">
-              <h5 class="text-primary mb-3">Task Priority Statistics</h5>
-              <div style="height: 300px">
-                <canvas id="priorityChart"></canvas>
-              </div>
-            </div>
+    <!-- Priority Chart -->
+    <div class="col-lg-4 mb-3">
+      <div class="chart-card">
+        <div class="card-header bg-white border-0 pb-2">
+          <h6 class="card-title mb-0 fw-semibold text-dark text-center pt-1">Priority Breakdown</h6>
+          <!-- <small class="text-muted">Tasks categorized by priority level</small> -->
+        </div>
+        <div class="card-body p-3">
+          <div class="chart-container">
+            <canvas id="priorityChart"></canvas>
           </div>
         </div>
+      </div>
+    </div>
 
-        <!-- Chart 3: Completion (Bar) -->
-        <div class="col-lg-4 mb-4">
-          <div class="card shadow rounded-4">
-            <div class="card-body text-center">
-              <h5 class="text-primary mb-3">Task Completion Trend</h5>
-              <div style="height: 300px">
-                <canvas id="completionChart"></canvas>
-              </div>
-            </div>
+    <!-- Employee Performance Chart -->
+    <div class="col-lg-4 mb-3">
+      <div class="chart-card">
+        <div class="card-header bg-white border-0 pb-2">
+          <h6 class="card-title mb-0 fw-semibold text-dark text-center pt-1">Employee Overview</h6>
+          <!-- <small class="text-muted">Employee engagement and activity</small> -->
+        </div>
+        <div class="card-body p-3">
+          <div class="chart-container">
+            <canvas id="employeeChart"></canvas>
           </div>
         </div>
       </div>
@@ -50,30 +219,53 @@
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
 
 <script>
+  // Professional Color Palette
+  const colors = {
+    pending: '#ffc107',
+    inProgress: '#17a2b8', 
+    completed: '#28a745',
+    high: '#dc3545',
+    medium: '#fd7e14',
+    low: '#20c997'
+  };
+
   // Pie Chart: Task Status Overview
   const statusChart = new Chart(document.getElementById('statusChart'), {
-    type: 'pie',
+    type: 'doughnut',
     data: {
       labels: ['Pending', 'In Progress', 'Completed'],
       datasets: [{
         data: [{{ pending }}, {{ inprogress }}, {{ completed }}],
-        backgroundColor: ['#f1c40f', '#1abc9c', '#2ecc71']
+        backgroundColor: [colors.pending, colors.inProgress, colors.completed],
+        borderWidth: 3,
+        borderColor: '#ffffff',
+        hoverBorderWidth: 4
       }]
     },
     options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: '60%',
       plugins: {
-        datalabels: {
-          color: '#000',
-          font: { weight: 'bold' },
-          formatter: (value, ctx) => {
-            const total = ctx.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
-            const percent = ((value / total) * 100).toFixed(1);
-            return `${value} (${percent}%)`;
+        legend: { 
+          position: 'bottom',
+          labels: {
+            padding: 20,
+            usePointStyle: true,
+            font: { size: 12, weight: '500' }
           }
         },
-        legend: { position: 'bottom' }
-      },
-      maintainAspectRatio: false
+        datalabels: {
+          color: '#ffffff',
+          font: { weight: 'bold', size: 14 },
+          formatter: (value, ctx) => {
+            if (value === 0) return '';
+            const total = ctx.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+            const percent = ((value / total) * 100).toFixed(0);
+            return `${percent}%`;
+          }
+        }
+      }
     },
     plugins: [ChartDataLabels]
   });
@@ -84,53 +276,80 @@
     data: {
       labels: ['High', 'Medium', 'Low'],
       datasets: [{
-        label: 'Task Priority',
-        data: [{{ high }}, {{ medium }}, {{ low }}],
-        backgroundColor: ['#e74c3c', '#f39c12', '#27ae60']
+        label: 'Tasks',
+        data: [{{ high_priority }}, {{ medium_priority }}, {{ low_priority }}],
+        backgroundColor: [colors.high, colors.medium, colors.low],
+        borderRadius: 8,
+        borderSkipped: false,
       }]
     },
     options: {
+      responsive: true,
       maintainAspectRatio: false,
       plugins: {
         legend: { display: false },
         datalabels: {
-          color: '#fff',
+          color: '#ffffff',
           anchor: 'center',
           align: 'center',
-          font: { weight: 'bold' }
+          font: { weight: 'bold', size: 14 },
+          formatter: (value) => value > 0 ? value : ''
         }
       },
       scales: {
-        y: { beginAtZero: true }
+        y: { 
+          beginAtZero: true,
+          grid: { color: '#f8f9fa' },
+          ticks: { font: { size: 11 } }
+        },
+        x: {
+          grid: { display: false },
+          ticks: { font: { size: 11, weight: '500' } }
+        }
       }
     },
     plugins: [ChartDataLabels]
   });
 
-  // Bar Chart: Task Completion
-  const completionChart = new Chart(document.getElementById('completionChart'), {
+  // Bar Chart: Employee Overview
+  const employeeChart = new Chart(document.getElementById('employeeChart'), {
     type: 'bar',
     data: {
-      labels: ['Pending', 'In Progress', 'Completed'],
+      labels: ['Total Employees', 'Active Employees', 'Recent Tasks', 'Overdue Tasks'],
       datasets: [{
-        label: 'Task Completion',
-        data: [{{ pending }}, {{ inprogress }}, {{ completed }}],
-        backgroundColor: ['#f1c40f', '#1abc9c', '#2ecc71']
+        label: 'Count',
+        data: [{{ total_employees }}, {{ employees_with_tasks }}, {{ recent_tasks }}, {{ overdue_tasks }}],
+        backgroundColor: ['#6f42c1', '#20c997', '#17a2b8', '#dc3545'],
+        borderRadius: 8,
+        borderSkipped: false,
       }]
     },
     options: {
+      responsive: true,
       maintainAspectRatio: false,
       plugins: {
         legend: { display: false },
         datalabels: {
-          color: '#fff',
+          color: '#ffffff',
           anchor: 'center',
           align: 'center',
-          font: { weight: 'bold' }
+          font: { weight: 'bold', size: 14 },
+          formatter: (value) => value > 0 ? value : ''
         }
       },
       scales: {
-        y: { beginAtZero: true }
+        y: {
+          beginAtZero: true,
+          grid: { color: '#f8f9fa' },
+          ticks: { font: { size: 11 } }
+        },
+        x: {
+          grid: { display: false },
+          ticks: {
+            font: { size: 10, weight: '500' },
+            maxRotation: 45
+          }
+        }
       }
     },
     plugins: [ChartDataLabels]
